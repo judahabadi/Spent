@@ -1,0 +1,12 @@
+*.xcuserstate
+xcuserdata/
+.DS_Store
+*.ipa
+*.dSYM.zip
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+vendor/
+.bundle/
+Pods/
