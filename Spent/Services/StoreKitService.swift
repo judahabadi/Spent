@@ -67,10 +67,13 @@ final class StoreKitService {
             }
         }
 
+        let finalActive = hasActive
+        let finalTrialing = hasTrialing
+        let finalExpiry = expiry
         await MainActor.run {
-            isSubscribed = hasActive
-            isTrialing = hasTrialing
-            subscriptionExpiry = expiry
+            isSubscribed = finalActive
+            isTrialing = finalTrialing
+            subscriptionExpiry = finalExpiry
         }
     }
 
