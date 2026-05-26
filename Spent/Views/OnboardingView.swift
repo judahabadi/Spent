@@ -255,7 +255,11 @@ struct EmailAuthView: View {
                     Task {
                         isLoading = true
                         do {
-                            try await appVM.auth.signInWithEmail(email, password: password)
+                            if isSignUp {
+                                try await appVM.auth.signUpWithEmail(email, password: password)
+                            } else {
+                                try await appVM.auth.signInWithEmail(email, password: password)
+                            }
                             dismiss()
                         } catch {
                             self.error = error.localizedDescription
