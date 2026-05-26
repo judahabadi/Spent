@@ -13,7 +13,7 @@ struct PaywallView: View {
 
             VStack(spacing: 16) {
                 Text("Unlock the full receipt.")
-                    .font(.system(size: 26, design: .monospaced, weight: .bold))
+                    .font(.system(size: 26, weight: .bold, design: .monospaced))
                     .multilineTextAlignment(.center)
 
                 Text("Full receipts, history, widgets.\n$1/mo.")
@@ -40,7 +40,7 @@ struct PaywallView: View {
                             .tint(Color(.systemBackground))
                     } else {
                         Text("Subscribe for $1/mo")
-                            .font(.system(size: 16, design: .monospaced, weight: .semibold))
+                            .font(.system(size: 16, weight: .semibold, design: .monospaced))
                     }
                 }
                 .frame(maxWidth: .infinity)

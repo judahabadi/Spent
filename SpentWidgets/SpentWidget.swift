@@ -113,14 +113,14 @@ struct SpentWidgetEntryView: View {
             } else {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("SPENT")
-                        .font(.system(size: 9, design: .monospaced, weight: .bold))
+                        .font(.system(size: 9, weight: .bold, design: .monospaced))
                         .foregroundStyle(.secondary)
 
                     VStack(alignment: .leading, spacing: 2) {
                         HStack {
                             Circle().fill(.red).frame(width: 5, height: 5)
                             Text(formatted(entry.spentCost))
-                                .font(.system(size: 14, design: .monospaced, weight: .bold))
+                                .font(.system(size: 14, weight: .bold, design: .monospaced))
                         }
                         Text("spent")
                             .font(.system(size: 9, design: .monospaced))
@@ -131,7 +131,7 @@ struct SpentWidgetEntryView: View {
                         HStack {
                             Circle().fill(.green).frame(width: 5, height: 5)
                             Text(formatted(entry.investedCredit))
-                                .font(.system(size: 14, design: .monospaced, weight: .bold))
+                                .font(.system(size: 14, weight: .bold, design: .monospaced))
                                 .foregroundStyle(.green)
                         }
                         Text("invested")
@@ -160,7 +160,7 @@ struct SpentWidgetEntryView: View {
                     // Left: split
                     VStack(alignment: .leading, spacing: 8) {
                         Text("TODAY")
-                            .font(.system(size: 9, design: .monospaced, weight: .bold))
+                            .font(.system(size: 9, weight: .bold, design: .monospaced))
                             .foregroundStyle(.secondary)
                         amountRow(label: "SPENT", amount: entry.spentCost, color: .red)
                         amountRow(label: "INVESTED", amount: entry.investedCredit, color: .green)
@@ -171,7 +171,7 @@ struct SpentWidgetEntryView: View {
                                 .foregroundStyle(.secondary)
                             Spacer()
                             Text(formatted(abs(entry.netTotal)))
-                                .font(.system(size: 13, design: .monospaced, weight: .bold))
+                                .font(.system(size: 13, weight: .bold, design: .monospaced))
                                 .foregroundStyle(entry.netTotal > 0 ? .red : .green)
                         }
                     }
@@ -183,10 +183,10 @@ struct SpentWidgetEntryView: View {
                     // Right: top offender + streak
                     VStack(alignment: .leading, spacing: 8) {
                         Text("TOP OFFENDER")
-                            .font(.system(size: 9, design: .monospaced, weight: .bold))
+                            .font(.system(size: 9, weight: .bold, design: .monospaced))
                             .foregroundStyle(.secondary)
                         Text(entry.topOffender)
-                            .font(.system(size: 13, design: .monospaced, weight: .semibold))
+                            .font(.system(size: 13, weight: .semibold, design: .monospaced))
                             .lineLimit(2)
                         Spacer()
                         Text("🔥 \(entry.streak) day streak")
@@ -209,7 +209,7 @@ struct SpentWidgetEntryView: View {
             } else {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("7-DAY SPENDING")
-                        .font(.system(size: 10, design: .monospaced, weight: .bold))
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
                         .foregroundStyle(.secondary)
                         .padding(.horizontal, 16)
                         .padding(.top, 16)
@@ -270,7 +270,7 @@ struct SpentWidgetEntryView: View {
                 .font(.system(size: 8, design: .monospaced))
                 .foregroundStyle(.secondary)
             Text(formatted(amount))
-                .font(.system(size: 13, design: .monospaced, weight: .bold))
+                .font(.system(size: 13, weight: .bold, design: .monospaced))
                 .foregroundStyle(color)
         }
     }

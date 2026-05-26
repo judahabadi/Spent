@@ -16,7 +16,7 @@ struct ShareableImageView: View {
                 // Header
                 VStack(spacing: 4) {
                     Text("SPENT")
-                        .font(.system(size: 32, design: .monospaced, weight: .bold))
+                        .font(.system(size: 32, weight: .bold, design: .monospaced))
                         .foregroundStyle(.white)
                     Text(receipt.date.formatted(date: .complete, time: .omitted).uppercased())
                         .font(.system(size: 10, design: .monospaced))
@@ -54,7 +54,7 @@ struct ShareableImageView: View {
                 // Net total
                 HStack {
                     Text(receipt.isProfitDay ? "YOU EARNED" : "TOTAL DUE")
-                        .font(.system(size: 14, design: .monospaced, weight: .bold))
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
                         .foregroundStyle(.white)
                     Spacer()
                     Text(
@@ -62,7 +62,7 @@ struct ShareableImageView: View {
                             ? "+\(CalculationEngine.formatCurrency(abs(receipt.netTotal)))"
                             : CalculationEngine.formatCurrency(receipt.netTotal)
                     )
-                    .font(.system(size: 14, design: .monospaced, weight: .bold))
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
                     .foregroundStyle(receipt.isProfitDay ? .green : .red)
                 }
                 .padding(.horizontal, 28)

@@ -1,3 +1,4 @@
+import Foundation
 import DeviceActivity
 import Foundation
 import FamilyControls

@@ -12,7 +12,7 @@ struct PermissionDeniedView: View {
                 .foregroundStyle(.secondary)
 
             Text("Spent needs access\nto Screen Time")
-                .font(.system(size: 24, design: .monospaced, weight: .bold))
+                .font(.system(size: 24, weight: .bold, design: .monospaced))
                 .multilineTextAlignment(.center)
 
             VStack(alignment: .leading, spacing: 12) {
@@ -32,7 +32,7 @@ struct PermissionDeniedView: View {
                     }
                 } label: {
                     Text("Open Settings")
-                        .font(.system(size: 16, design: .monospaced, weight: .semibold))
+                        .font(.system(size: 16, weight: .semibold, design: .monospaced))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
                         .background(.primary)
@@ -56,7 +56,7 @@ struct PermissionDeniedView: View {
     private func step(number: Int, text: String) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Text("\(number).")
-                .font(.system(size: 13, design: .monospaced, weight: .bold))
+                .font(.system(size: 13, weight: .bold, design: .monospaced))
                 .foregroundStyle(.secondary)
             Text(text)
                 .font(.system(size: 13, design: .monospaced))

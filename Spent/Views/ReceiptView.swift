@@ -116,7 +116,7 @@ struct ReceiptView: View {
     private var receiptHeader: some View {
         VStack(spacing: 4) {
             Text("SPENT")
-                .font(.system(size: 22, design: .monospaced, weight: .bold))
+                .font(.system(size: 22, weight: .bold, design: .monospaced))
             Text(appVM.selectedDate.formatted(date: .complete, time: .omitted).uppercased())
                 .font(.system(size: 10, design: .monospaced))
                 .foregroundStyle(.secondary)
@@ -127,7 +127,7 @@ struct ReceiptView: View {
 
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
-            .font(.system(size: 10, design: .monospaced, weight: .bold))
+            .font(.system(size: 10, weight: .bold, design: .monospaced))
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 16)
@@ -214,7 +214,7 @@ struct ReceiptView: View {
 
         return HStack {
             Text(isProfitDay ? "YOU EARNED" : "TOTAL DUE")
-                .font(.system(size: 13, design: .monospaced, weight: .bold))
+                .font(.system(size: 13, weight: .bold, design: .monospaced))
             Spacer()
             if appVM.storeKit.isDegraded {
                 Button { appVM.isShowingPaywall = true } label: {
@@ -222,12 +222,12 @@ struct ReceiptView: View {
                         Image(systemName: "lock.fill").font(.system(size: 10))
                         Text("$--.--")
                     }
-                    .font(.system(size: 13, design: .monospaced, weight: .bold))
+                    .font(.system(size: 13, weight: .bold, design: .monospaced))
                     .foregroundStyle(.primary)
                 }
             } else {
                 Text(isProfitDay ? "+\(CalculationEngine.formatCurrency(abs(net)))" : CalculationEngine.formatCurrency(net))
-                    .font(.system(size: 13, design: .monospaced, weight: .bold))
+                    .font(.system(size: 13, weight: .bold, design: .monospaced))
                     .foregroundStyle(isProfitDay ? .green : .red)
             }
         }
@@ -249,7 +249,7 @@ struct ReceiptView: View {
     private var statsPanel: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text("STATS")
-                .font(.system(size: 14, design: .monospaced, weight: .bold))
+                .font(.system(size: 14, weight: .bold, design: .monospaced))
                 .padding(.top, 60)
 
             VStack(alignment: .leading, spacing: 8) {
@@ -257,7 +257,7 @@ struct ReceiptView: View {
                     .font(.system(size: 10, design: .monospaced))
                     .foregroundStyle(.secondary)
                 Text("\u{1F525} \(appVM.streak.currentStreak) days")
-                    .font(.system(size: 24, design: .monospaced, weight: .bold))
+                    .font(.system(size: 24, weight: .bold, design: .monospaced))
             }
 
             VStack(alignment: .leading, spacing: 8) {

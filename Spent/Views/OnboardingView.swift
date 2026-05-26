@@ -33,7 +33,7 @@ struct OnboardingView: View {
         VStack(spacing: 24) {
             Spacer()
             Text("Every minute costs\nyou something.")
-                .font(.system(size: 28, design: .monospaced, weight: .bold))
+                .font(.system(size: 28, weight: .bold, design: .monospaced))
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
 
@@ -49,7 +49,7 @@ struct OnboardingView: View {
                 withAnimation { page = 1 }
             } label: {
                 Text("Start Free Trial")
-                    .font(.system(size: 16, design: .monospaced, weight: .semibold))
+                    .font(.system(size: 16, weight: .semibold, design: .monospaced))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .background(.primary)
@@ -73,6 +73,14 @@ struct OnboardingView: View {
                 categoryRow(symbol: "minus.circle", label: "NEUTRAL", description: "shown free", color: .secondary)
             }
             .padding(.horizontal, 32)
+
+            if let authError = appVM.auth.authError {
+                Text(authError)
+                    .font(.system(size: 12, design: .monospaced))
+                    .foregroundStyle(.red)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+            }
 
             Spacer()
 
@@ -103,7 +111,7 @@ struct OnboardingView: View {
                 .foregroundStyle(color)
                 .frame(width: 24)
             Text(label)
-                .font(.system(size: 12, design: .monospaced, weight: .bold))
+                .font(.system(size: 12, weight: .bold, design: .monospaced))
             Text("—")
                 .foregroundStyle(.secondary)
             Text(description)
@@ -124,7 +132,7 @@ struct OnboardingView: View {
             Spacer()
 
             Text("Set your rate")
-                .font(.system(size: 22, design: .monospaced, weight: .bold))
+                .font(.system(size: 22, weight: .bold, design: .monospaced))
 
             modePicker
             rateInputs
@@ -138,7 +146,7 @@ struct OnboardingView: View {
                 }
             } label: {
                 Text("Grant Access")
-                    .font(.system(size: 16, design: .monospaced, weight: .semibold))
+                    .font(.system(size: 16, weight: .semibold, design: .monospaced))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .background(.primary)
@@ -255,7 +263,11 @@ struct EmailAuthView: View {
                     Task {
                         isLoading = true
                         do {
-                            try await appVM.auth.signInWithEmail(email, password: password)
+                            if isSignUp {
+                                try await appVM.auth.signUpWithEmail(email, password: password)
+                            } else {
+                                try await appVM.auth.signInWithEmail(email, password: password)
+                            }
                             dismiss()
                         } catch {
                             self.error = error.localizedDescription
@@ -267,7 +279,7 @@ struct EmailAuthView: View {
                         ProgressView()
                     } else {
                         Text(isSignUp ? "Sign Up" : "Sign In")
-                            .font(.system(size: 16, design: .monospaced, weight: .semibold))
+                            .font(.system(size: 16, weight: .semibold, design: .monospaced))
                             .frame(maxWidth: .infinity)
                     }
                 }
