@@ -1,0 +1,32 @@
+# Deployment is handled by Xcode Cloud (Apple's built-in CI/CD).
+#
+# Setup steps (one-time, in App Store Connect):
+# 1. Sign in to appstoreconnect.apple.com → Xcode Cloud
+# 2. Create a new workflow for the Spent project
+# 3. Set start condition: push to `main` branch
+# 4. Add build action: build + archive
+# 5. Add post-action: deploy to TestFlight (internal testing)
+# 6. Connect your GitHub repo when prompted
+#
+# Xcode Cloud provides 25 free compute hours/month for Apple Developer Program members.
+# No secrets to manage — it uses your App Store Connect session directly.
+#
+# For advanced configuration, workflow files live in:
+#   Spent.xcodeproj/xcshareddata/xcschemes/
+# and are committed to git automatically by Xcode Cloud.
+
+name: Xcode Cloud Deployment (Reference)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deployment via Xcode Cloud
+        run: |
+          echo "Deployment is managed by Xcode Cloud."
+          echo "Configure at: https://appstoreconnect.apple.com/ci"
+          echo "Push to main triggers Xcode Cloud automatically once configured."

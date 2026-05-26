@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleDisplayName</key>
-    <string>SpentActivityReport</string>
+    <string>SpentWidgets</string>
     <key>CFBundleIdentifier</key>
-    <string>app.spent.activityreport</string>
+    <string>app.spent.widgets</string>
     <key>CFBundleShortVersionString</key>
     <string>1.0</string>
     <key>CFBundleVersion</key>
@@ -13,9 +13,7 @@
     <key>NSExtension</key>
     <dict>
         <key>NSExtensionPointIdentifier</key>
-        <string>com.apple.deviceactivity.report</string>
-        <key>NSExtensionPrincipalClass</key>
-        <string>$(PRODUCT_MODULE_NAME).SpentActivityReportExtension</string>
+        <string>com.apple.widgetkit-extension</string>
     </dict>
 </dict>
 </plist>

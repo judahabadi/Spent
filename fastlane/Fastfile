@@ -1,0 +1,27 @@
+default_platform(:ios)
+
+platform :ios do
+
+  desc "Run tests locally"
+  lane :test do
+    run_tests(
+      project: "Spent.xcodeproj",
+      scheme: "Spent",
+      devices: ["iPhone 16"],
+      result_bundle: true
+    )
+  end
+
+  desc "Build for local verification (no upload)"
+  lane :build do
+    build_app(
+      project: "Spent.xcodeproj",
+      scheme: "Spent",
+      export_method: "development",
+      skip_archive: false
+    )
+  end
+
+end
+# Deployment to TestFlight is handled by Xcode Cloud.
+# Configure at: https://appstoreconnect.apple.com/ci

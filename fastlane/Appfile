@@ -1,0 +1,3 @@
+app_identifier("app.spent")
+apple_id("your@email.com") # Replace with your Apple ID
+# team_id and itc_team_id are handled by Xcode Cloud

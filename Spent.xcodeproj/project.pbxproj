@@ -1,0 +1,1108 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AA000001000000000000001B /* SpentApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000001A /* SpentApp.swift */; };
+		AA000002000000000000001B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000001A /* ContentView.swift */; };
+		AA000003000000000000001B /* DailyReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000003000000000000001A /* DailyReceipt.swift */; };
+		AA000004000000000000001B /* AppUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000004000000000000001A /* AppUsage.swift */; };
+		AA000005000000000000001B /* UserMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000005000000000000001A /* UserMode.swift */; };
+		AA000006000000000000001B /* StreakRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000006000000000000001A /* StreakRecord.swift */; };
+		AA000007000000000000001B /* ScreenTimeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000007000000000000001A /* ScreenTimeService.swift */; };
+		AA000008000000000000001B /* CalculationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000008000000000000001A /* CalculationEngine.swift */; };
+		AA000009000000000000001B /* CloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000009000000000000001A /* CloudKitService.swift */; };
+		AA00000A000000000000001B /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000A000000000000001A /* AuthService.swift */; };
+		AA00000B000000000000001B /* StoreKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000B000000000000001A /* StoreKitService.swift */; };
+		AA00000C000000000000001B /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000C000000000000001A /* NotificationService.swift */; };
+		AA00000D000000000000001B /* ReceiptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000D000000000000001A /* ReceiptView.swift */; };
+		AA00000E000000000000001B /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000E000000000000001A /* OnboardingView.swift */; };
+		AA00000F000000000000001B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000F000000000000001A /* SettingsView.swift */; };
+		AA000010000000000000001B /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000010000000000000001A /* PaywallView.swift */; };
+		AA000011000000000000001B /* PermissionDeniedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000011000000000000001A /* PermissionDeniedView.swift */; };
+		AA000012000000000000001B /* ShareableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000012000000000000001A /* ShareableImageView.swift */; };
+		AA000013000000000000001B /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000013000000000000001A /* AppViewModel.swift */; };
+		AA000014000000000000001B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000014000000000000001A /* Assets.xcassets */; };
+		AA000015000000000000001B /* Spent.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = AA000015000000000000001A /* Spent.entitlements */; };
+		AA000016000000000000001B /* FamilyControls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000016000000000000001A /* FamilyControls.framework */; };
+		AA000017000000000000001B /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000017000000000000001A /* DeviceActivity.framework */; };
+		AA000018000000000000001B /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000018000000000000001A /* CloudKit.framework */; };
+		AA000019000000000000001B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000019000000000000001A /* StoreKit.framework */; };
+		AA00001A000000000000001B /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA00001A000000000000001A /* AuthenticationServices.framework */; };
+		AA00001B000000000000001B /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA00001B000000000000001A /* WidgetKit.framework */; };
+		AA00001C000000000000001B /* MetricKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA00001C000000000000001A /* MetricKit.framework */; };
+		AA000020000000000000001B /* SpentWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000020000000000000001A /* SpentWidgetsBundle.swift */; };
+		AA000021000000000000001B /* SpentWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000021000000000000001A /* SpentWidget.swift */; };
+		AA000022000000000000001B /* SpentWidgets.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = AA000022000000000000001A /* SpentWidgets.entitlements */; };
+		AA000030000000000000001B /* SpentActivityReportExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000030000000000000001A /* SpentActivityReportExtension.swift */; };
+		AA000031000000000000001B /* TotalActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000031000000000000001A /* TotalActivityView.swift */; };
+		AA000032000000000000001B /* SpentActivityReport.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = AA000032000000000000001A /* SpentActivityReport.entitlements */; };
+		AA000040000000000000001B /* SpentActivityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000040000000000000001A /* SpentActivityMonitor.swift */; };
+		AA000041000000000000001B /* SpentActivityMonitor.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = AA000041000000000000001A /* SpentActivityMonitor.entitlements */; };
+		AA000050000000000000001B /* SpentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000050000000000000001A /* SpentTests.swift */; };
+		AA000051000000000000001B /* CalculationEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000051000000000000001A /* CalculationEngineTests.swift */; };
+		AA000060000000000000001B /* SpentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000060000000000000001A /* SpentUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		AA000001000000000000001A /* SpentApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpentApp.swift; sourceTree = "<group>"; };
+		AA000002000000000000001A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		AA000003000000000000001A /* DailyReceipt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyReceipt.swift; sourceTree = "<group>"; };
+		AA000004000000000000001A /* AppUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUsage.swift; sourceTree = "<group>"; };
+		AA000005000000000000001A /* UserMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserMode.swift; sourceTree = "<group>"; };
+		AA000006000000000000001A /* StreakRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakRecord.swift; sourceTree = "<group>"; };
+		AA000007000000000000001A /* ScreenTimeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTimeService.swift; sourceTree = "<group>"; };
+		AA000008000000000000001A /* CalculationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculationEngine.swift; sourceTree = "<group>"; };
+		AA000009000000000000001A /* CloudKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitService.swift; sourceTree = "<group>"; };
+		AA00000A000000000000001A /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		AA00000B000000000000001A /* StoreKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitService.swift; sourceTree = "<group>"; };
+		AA00000C000000000000001A /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		AA00000D000000000000001A /* ReceiptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptView.swift; sourceTree = "<group>"; };
+		AA00000E000000000000001A /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		AA00000F000000000000001A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AA000010000000000000001A /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		AA000011000000000000001A /* PermissionDeniedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionDeniedView.swift; sourceTree = "<group>"; };
+		AA000012000000000000001A /* ShareableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareableImageView.swift; sourceTree = "<group>"; };
+		AA000013000000000000001A /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
+		AA000014000000000000001A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AA000015000000000000001A /* Spent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Spent.entitlements; sourceTree = "<group>"; };
+		AA0000151000000000000001 /* Spent-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info.plist"; sourceTree = "<group>"; };
+		AA000016000000000000001A /* FamilyControls.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FamilyControls.framework; path = System/Library/Frameworks/FamilyControls.framework; sourceTree = SDKROOT; };
+		AA000017000000000000001A /* DeviceActivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceActivity.framework; path = System/Library/Frameworks/DeviceActivity.framework; sourceTree = SDKROOT; };
+		AA000018000000000000001A /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		AA000019000000000000001A /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		AA00001A000000000000001A /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
+		AA00001B000000000000001A /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		AA00001C000000000000001A /* MetricKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetricKit.framework; path = System/Library/Frameworks/MetricKit.framework; sourceTree = SDKROOT; };
+		AA00001D000000000000001A /* Spent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Spent.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000020000000000000001A /* SpentWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpentWidgetsBundle.swift; sourceTree = "<group>"; };
+		AA000021000000000000001A /* SpentWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpentWidget.swift; sourceTree = "<group>"; };
+		AA000022000000000000001A /* SpentWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SpentWidgets.entitlements; sourceTree = "<group>"; };
+		AA0000221000000000000001 /* SpentWidgets-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info.plist"; sourceTree = "<group>"; };
+		AA00002D000000000000001A /* SpentWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SpentWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000030000000000000001A /* SpentActivityReportExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpentActivityReportExtension.swift; sourceTree = "<group>"; };
+		AA000031000000000000001A /* TotalActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalActivityView.swift; sourceTree = "<group>"; };
+		AA000032000000000000001A /* SpentActivityReport.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SpentActivityReport.entitlements; sourceTree = "<group>"; };
+		AA0000321000000000000001 /* SpentActivityReport-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info.plist"; sourceTree = "<group>"; };
+		AA00003D000000000000001A /* SpentActivityReport.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SpentActivityReport.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000040000000000000001A /* SpentActivityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpentActivityMonitor.swift; sourceTree = "<group>"; };
+		AA000041000000000000001A /* SpentActivityMonitor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SpentActivityMonitor.entitlements; sourceTree = "<group>"; };
+		AA0000411000000000000001 /* SpentActivityMonitor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info.plist"; sourceTree = "<group>"; };
+		AA00004D000000000000001A /* SpentActivityMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SpentActivityMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000050000000000000001A /* SpentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpentTests.swift; sourceTree = "<group>"; };
+		AA000051000000000000001A /* CalculationEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculationEngineTests.swift; sourceTree = "<group>"; };
+		AA00005D000000000000001A /* SpentTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpentTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000060000000000000001A /* SpentUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpentUITests.swift; sourceTree = "<group>"; };
+		AA00006D000000000000001A /* SpentUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpentUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AA00001D0000000000000010 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000016000000000000001B /* FamilyControls.framework in Frameworks */,
+				AA000017000000000000001B /* DeviceActivity.framework in Frameworks */,
+				AA000018000000000000001B /* CloudKit.framework in Frameworks */,
+				AA000019000000000000001B /* StoreKit.framework in Frameworks */,
+				AA00001A000000000000001B /* AuthenticationServices.framework in Frameworks */,
+				AA00001B000000000000001B /* WidgetKit.framework in Frameworks */,
+				AA00001C000000000000001B /* MetricKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00002D0000000000000010 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00003D0000000000000010 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00004D0000000000000010 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00005D0000000000000010 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00006D0000000000000010 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AAFFFFFF000000000000FFFF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AA00001D000000000000001A /* Spent.app */,
+				AA00002D000000000000001A /* SpentWidgets.appex */,
+				AA00003D000000000000001A /* SpentActivityReport.appex */,
+				AA00004D000000000000001A /* SpentActivityMonitor.appex */,
+				AA00005D000000000000001A /* SpentTests.xctest */,
+				AA00006D000000000000001A /* SpentUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AAFFFFFF000000000000FFFE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AA000016000000000000001A /* FamilyControls.framework */,
+				AA000017000000000000001A /* DeviceActivity.framework */,
+				AA000018000000000000001A /* CloudKit.framework */,
+				AA000019000000000000001A /* StoreKit.framework */,
+				AA00001A000000000000001A /* AuthenticationServices.framework */,
+				AA00001B000000000000001A /* WidgetKit.framework */,
+				AA00001C000000000000001A /* MetricKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		AAFFFFFF000000000000FFFD /* */ = {
+			isa = PBXGroup;
+			children = (
+				AAFFFFFF000000000000AAAA /* Spent */,
+				AAFFFFFF000000000000BBBB /* SpentWidgets */,
+				AAFFFFFF000000000000CCCC /* SpentActivityReport */,
+				AAFFFFFF000000000000DDDD /* SpentActivityMonitor */,
+				AAFFFFFF000000000000EEEE /* SpentTests */,
+				AAFFFFFF000000000000EEE0 /* SpentUITests */,
+				AAFFFFFF000000000000FFFF /* Products */,
+				AAFFFFFF000000000000FFFE /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		AAFFFFFF000000000000AAAA /* Spent */ = {
+			isa = PBXGroup;
+			children = (
+				AA000001000000000000001A /* SpentApp.swift */,
+				AA000002000000000000001A /* ContentView.swift */,
+				AAFFFFFF000000000000AAA1 /* Models */,
+				AAFFFFFF000000000000AAA2 /* Services */,
+				AAFFFFFF000000000000AAA3 /* Views */,
+				AAFFFFFF000000000000AAA4 /* ViewModels */,
+				AA000014000000000000001A /* Assets.xcassets */,
+				AA000015000000000000001A /* Spent.entitlements */,
+				AA0000151000000000000001 /* Info.plist */,
+			);
+			path = Spent;
+			sourceTree = "<group>";
+		};
+		AAFFFFFF000000000000AAA1 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				AA000003000000000000001A /* DailyReceipt.swift */,
+				AA000004000000000000001A /* AppUsage.swift */,
+				AA000005000000000000001A /* UserMode.swift */,
+				AA000006000000000000001A /* StreakRecord.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AAFFFFFF000000000000AAA2 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				AA000007000000000000001A /* ScreenTimeService.swift */,
+				AA000008000000000000001A /* CalculationEngine.swift */,
+				AA000009000000000000001A /* CloudKitService.swift */,
+				AA00000A000000000000001A /* AuthService.swift */,
+				AA00000B000000000000001A /* StoreKitService.swift */,
+				AA00000C000000000000001A /* NotificationService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		AAFFFFFF000000000000AAA3 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000D000000000000001A /* ReceiptView.swift */,
+				AA00000E000000000000001A /* OnboardingView.swift */,
+				AA00000F000000000000001A /* SettingsView.swift */,
+				AA000010000000000000001A /* PaywallView.swift */,
+				AA000011000000000000001A /* PermissionDeniedView.swift */,
+				AA000012000000000000001A /* ShareableImageView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AAFFFFFF000000000000AAA4 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				AA000013000000000000001A /* AppViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		AAFFFFFF000000000000BBBB /* SpentWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				AA000020000000000000001A /* SpentWidgetsBundle.swift */,
+				AA000021000000000000001A /* SpentWidget.swift */,
+				AA000022000000000000001A /* SpentWidgets.entitlements */,
+				AA0000221000000000000001 /* Info.plist */,
+			);
+			path = SpentWidgets;
+			sourceTree = "<group>";
+		};
+		AAFFFFFF000000000000CCCC /* SpentActivityReport */ = {
+			isa = PBXGroup;
+			children = (
+				AA000030000000000000001A /* SpentActivityReportExtension.swift */,
+				AA000031000000000000001A /* TotalActivityView.swift */,
+				AA000032000000000000001A /* SpentActivityReport.entitlements */,
+				AA0000321000000000000001 /* Info.plist */,
+			);
+			path = SpentActivityReport;
+			sourceTree = "<group>";
+		};
+		AAFFFFFF000000000000DDDD /* SpentActivityMonitor */ = {
+			isa = PBXGroup;
+			children = (
+				AA000040000000000000001A /* SpentActivityMonitor.swift */,
+				AA000041000000000000001A /* SpentActivityMonitor.entitlements */,
+				AA0000411000000000000001 /* Info.plist */,
+			);
+			path = SpentActivityMonitor;
+			sourceTree = "<group>";
+		};
+		AAFFFFFF000000000000EEEE /* SpentTests */ = {
+			isa = PBXGroup;
+			children = (
+				AA000050000000000000001A /* SpentTests.swift */,
+				AA000051000000000000001A /* CalculationEngineTests.swift */,
+			);
+			path = SpentTests;
+			sourceTree = "<group>";
+		};
+		AAFFFFFF000000000000EEE0 /* SpentUITests */ = {
+			isa = PBXGroup;
+			children = (
+				AA000060000000000000001A /* SpentUITests.swift */,
+			);
+			path = SpentUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AA00001D000000000000AAAA /* Spent */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA00001D000000000000CCCC /* Build configuration list for PBXNativeTarget "Spent" */;
+			buildPhases = (
+				AA00001D0000000000000020 /* Sources */,
+				AA00001D0000000000000010 /* Frameworks */,
+				AA00001D0000000000000030 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AA00002D000000000000DDDD /* PBXTargetDependency */,
+				AA00003D000000000000DDDD /* PBXTargetDependency */,
+				AA00004D000000000000DDDD /* PBXTargetDependency */,
+			);
+			name = Spent;
+			productName = Spent;
+			productReference = AA00001D000000000000001A /* Spent.app */;
+			productType = "com.apple.product-type.application";
+		};
+		AA00002D000000000000AAAA /* SpentWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA00002D000000000000CCCC /* Build configuration list for PBXNativeTarget "SpentWidgets" */;
+			buildPhases = (
+				AA00002D0000000000000020 /* Sources */,
+				AA00002D0000000000000010 /* Frameworks */,
+				AA00002D0000000000000030 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SpentWidgets;
+			productName = SpentWidgets;
+			productReference = AA00002D000000000000001A /* SpentWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		AA00003D000000000000AAAA /* SpentActivityReport */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA00003D000000000000CCCC /* Build configuration list for PBXNativeTarget "SpentActivityReport" */;
+			buildPhases = (
+				AA00003D0000000000000020 /* Sources */,
+				AA00003D0000000000000010 /* Frameworks */,
+				AA00003D0000000000000030 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SpentActivityReport;
+			productName = SpentActivityReport;
+			productReference = AA00003D000000000000001A /* SpentActivityReport.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		AA00004D000000000000AAAA /* SpentActivityMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA00004D000000000000CCCC /* Build configuration list for PBXNativeTarget "SpentActivityMonitor" */;
+			buildPhases = (
+				AA00004D0000000000000020 /* Sources */,
+				AA00004D0000000000000010 /* Frameworks */,
+				AA00004D0000000000000030 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SpentActivityMonitor;
+			productName = SpentActivityMonitor;
+			productReference = AA00004D000000000000001A /* SpentActivityMonitor.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		AA00005D000000000000AAAA /* SpentTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA00005D000000000000CCCC /* Build configuration list for PBXNativeTarget "SpentTests" */;
+			buildPhases = (
+				AA00005D0000000000000020 /* Sources */,
+				AA00005D0000000000000010 /* Frameworks */,
+				AA00005D0000000000000030 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AA00005D000000000000DDDD /* PBXTargetDependency */,
+			);
+			name = SpentTests;
+			productName = SpentTests;
+			productReference = AA00005D000000000000001A /* SpentTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		AA00006D000000000000AAAA /* SpentUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA00006D000000000000CCCC /* Build configuration list for PBXNativeTarget "SpentUITests" */;
+			buildPhases = (
+				AA00006D0000000000000020 /* Sources */,
+				AA00006D0000000000000010 /* Frameworks */,
+				AA00006D0000000000000030 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AA00006D000000000000DDDD /* PBXTargetDependency */,
+			);
+			name = SpentUITests;
+			productName = SpentUITests;
+			productReference = AA00006D000000000000001A /* SpentUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AAFFFFFF000000000000FFFC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					AA00001D000000000000AAAA = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					AA00002D000000000000AAAA = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					AA00003D000000000000AAAA = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					AA00004D000000000000AAAA = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					AA00005D000000000000AAAA = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = AA00001D000000000000AAAA;
+					};
+					AA00006D000000000000AAAA = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = AA00001D000000000000AAAA;
+					};
+				};
+			};
+			buildConfigurationList = AAFFFFFF000000000000CCCC /* Build configuration list for PBXProject "Spent" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AAFFFFFF000000000000FFFD /* */;
+			productRefGroup = AAFFFFFF000000000000FFFF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AA00001D000000000000AAAA /* Spent */,
+				AA00002D000000000000AAAA /* SpentWidgets */,
+				AA00003D000000000000AAAA /* SpentActivityReport */,
+				AA00004D000000000000AAAA /* SpentActivityMonitor */,
+				AA00005D000000000000AAAA /* SpentTests */,
+				AA00006D000000000000AAAA /* SpentUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AA00001D0000000000000030 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000014000000000000001B /* Assets.xcassets in Resources */,
+				AA000015000000000000001B /* Spent.entitlements in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00002D0000000000000030 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000022000000000000001B /* SpentWidgets.entitlements in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00003D0000000000000030 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000032000000000000001B /* SpentActivityReport.entitlements in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00004D0000000000000030 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000041000000000000001B /* SpentActivityMonitor.entitlements in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00005D0000000000000030 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00006D0000000000000030 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AA00001D0000000000000020 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000001000000000000001B /* SpentApp.swift in Sources */,
+				AA000002000000000000001B /* ContentView.swift in Sources */,
+				AA000003000000000000001B /* DailyReceipt.swift in Sources */,
+				AA000004000000000000001B /* AppUsage.swift in Sources */,
+				AA000005000000000000001B /* UserMode.swift in Sources */,
+				AA000006000000000000001B /* StreakRecord.swift in Sources */,
+				AA000007000000000000001B /* ScreenTimeService.swift in Sources */,
+				AA000008000000000000001B /* CalculationEngine.swift in Sources */,
+				AA000009000000000000001B /* CloudKitService.swift in Sources */,
+				AA00000A000000000000001B /* AuthService.swift in Sources */,
+				AA00000B000000000000001B /* StoreKitService.swift in Sources */,
+				AA00000C000000000000001B /* NotificationService.swift in Sources */,
+				AA00000D000000000000001B /* ReceiptView.swift in Sources */,
+				AA00000E000000000000001B /* OnboardingView.swift in Sources */,
+				AA00000F000000000000001B /* SettingsView.swift in Sources */,
+				AA000010000000000000001B /* PaywallView.swift in Sources */,
+				AA000011000000000000001B /* PermissionDeniedView.swift in Sources */,
+				AA000012000000000000001B /* ShareableImageView.swift in Sources */,
+				AA000013000000000000001B /* AppViewModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00002D0000000000000020 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000020000000000000001B /* SpentWidgetsBundle.swift in Sources */,
+				AA000021000000000000001B /* SpentWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00003D0000000000000020 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000030000000000000001B /* SpentActivityReportExtension.swift in Sources */,
+				AA000031000000000000001B /* TotalActivityView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00004D0000000000000020 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000040000000000000001B /* SpentActivityMonitor.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00005D0000000000000020 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000050000000000000001B /* SpentTests.swift in Sources */,
+				AA000051000000000000001B /* CalculationEngineTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00006D0000000000000020 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000060000000000000001B /* SpentUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AA00002D000000000000DDDD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA00002D000000000000AAAA /* SpentWidgets */;
+			targetProxy = AA00002D000000000000EEEE /* PBXContainerItemProxy */;
+		};
+		AA00003D000000000000DDDD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA00003D000000000000AAAA /* SpentActivityReport */;
+			targetProxy = AA00003D000000000000EEEE /* PBXContainerItemProxy */;
+		};
+		AA00004D000000000000DDDD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA00004D000000000000AAAA /* SpentActivityMonitor */;
+			targetProxy = AA00004D000000000000EEEE /* PBXContainerItemProxy */;
+		};
+		AA00005D000000000000DDDD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA00001D000000000000AAAA /* Spent */;
+			targetProxy = AA00005D000000000000EEEE /* PBXContainerItemProxy */;
+		};
+		AA00006D000000000000DDDD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA00001D000000000000AAAA /* Spent */;
+			targetProxy = AA00006D000000000000EEEE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXContainerItemProxy section */
+		AA00002D000000000000EEEE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAFFFFFF000000000000FFFC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA00002D000000000000AAAA;
+			remoteInfo = SpentWidgets;
+		};
+		AA00003D000000000000EEEE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAFFFFFF000000000000FFFC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA00003D000000000000AAAA;
+			remoteInfo = SpentActivityReport;
+		};
+		AA00004D000000000000EEEE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAFFFFFF000000000000FFFC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA00004D000000000000AAAA;
+			remoteInfo = SpentActivityMonitor;
+		};
+		AA00005D000000000000EEEE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAFFFFFF000000000000FFFC /* Project object */;
+			proxyType = 2;
+			remoteGlobalIDString = AA00001D000000000000AAAA;
+			remoteInfo = Spent;
+		};
+		AA00006D000000000000EEEE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAFFFFFF000000000000FFFC /* Project object */;
+			proxyType = 2;
+			remoteGlobalIDString = AA00001D000000000000AAAA;
+			remoteInfo = Spent;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin XCBuildConfiguration section */
+		AAFFFFFF000000000000CCC1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		AAFFFFFF000000000000CCC2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AA00001D000000000000CCC1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Spent/Spent.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Spent/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.spent";
+				PRODUCT_NAME = Spent;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA00001D000000000000CCC2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Spent/Spent.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Spent/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.spent";
+				PRODUCT_NAME = Spent;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AA00002D000000000000CCC1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SpentWidgets/SpentWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SpentWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.spent.widgets";
+				PRODUCT_NAME = SpentWidgets;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA00002D000000000000CCC2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SpentWidgets/SpentWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SpentWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.spent.widgets";
+				PRODUCT_NAME = SpentWidgets;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AA00003D000000000000CCC1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SpentActivityReport/SpentActivityReport.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SpentActivityReport/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.spent.activityreport";
+				PRODUCT_NAME = SpentActivityReport;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA00003D000000000000CCC2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SpentActivityReport/SpentActivityReport.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SpentActivityReport/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.spent.activityreport";
+				PRODUCT_NAME = SpentActivityReport;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AA00004D000000000000CCC1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SpentActivityMonitor/SpentActivityMonitor.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SpentActivityMonitor/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.spent.activitymonitor";
+				PRODUCT_NAME = SpentActivityMonitor;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA00004D000000000000CCC2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SpentActivityMonitor/SpentActivityMonitor.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SpentActivityMonitor/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.spent.activitymonitor";
+				PRODUCT_NAME = SpentActivityMonitor;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AA00005D000000000000CCC1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.spent.tests";
+				PRODUCT_NAME = SpentTests;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Spent.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Spent";
+			};
+			name = Debug;
+		};
+		AA00005D000000000000CCC2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.spent.tests";
+				PRODUCT_NAME = SpentTests;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Spent.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Spent";
+			};
+			name = Release;
+		};
+		AA00006D000000000000CCC1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.spent.uitests";
+				PRODUCT_NAME = SpentUITests;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Spent;
+			};
+			name = Debug;
+		};
+		AA00006D000000000000CCC2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.spent.uitests";
+				PRODUCT_NAME = SpentUITests;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Spent;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AAFFFFFF000000000000CCCC /* Build configuration list for PBXProject "Spent" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAFFFFFF000000000000CCC1 /* Debug */,
+				AAFFFFFF000000000000CCC2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA00001D000000000000CCCC /* Build configuration list for PBXNativeTarget "Spent" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA00001D000000000000CCC1 /* Debug */,
+				AA00001D000000000000CCC2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA00002D000000000000CCCC /* Build configuration list for PBXNativeTarget "SpentWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA00002D000000000000CCC1 /* Debug */,
+				AA00002D000000000000CCC2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA00003D000000000000CCCC /* Build configuration list for PBXNativeTarget "SpentActivityReport" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA00003D000000000000CCC1 /* Debug */,
+				AA00003D000000000000CCC2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA00004D000000000000CCCC /* Build configuration list for PBXNativeTarget "SpentActivityMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA00004D000000000000CCC1 /* Debug */,
+				AA00004D000000000000CCC2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA00005D000000000000CCCC /* Build configuration list for PBXNativeTarget "SpentTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA00005D000000000000CCC1 /* Debug */,
+				AA00005D000000000000CCC2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA00006D000000000000CCCC /* Build configuration list for PBXNativeTarget "SpentUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA00006D000000000000CCC1 /* Debug */,
+				AA00006D000000000000CCC2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = AAFFFFFF000000000000FFFC /* Project object */;
+}
