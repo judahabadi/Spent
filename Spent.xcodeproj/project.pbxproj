@@ -42,6 +42,12 @@
 		AA000030000000000000001B /* SpentActivityReportExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000030000000000000001A /* SpentActivityReportExtension.swift */; };
 		AA000031000000000000001B /* TotalActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000031000000000000001A /* TotalActivityView.swift */; };
 		AA000032000000000000001B /* SpentActivityReport.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = AA000032000000000000001A /* SpentActivityReport.entitlements */; };
+		AA00003DFF000000000000FF03 /* DailyReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000003000000000000001A /* DailyReceipt.swift */; };
+		AA00003DFF000000000000FF04 /* AppUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000004000000000000001A /* AppUsage.swift */; };
+		AA00003DFF000000000000FF05 /* UserMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000005000000000000001A /* UserMode.swift */; };
+		AA00003DFF000000000000FF1E /* CategoryClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00001E000000000000001A /* CategoryClassifier.swift */; };
+		AA00003DFF000000000000FF16 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000017000000000000001A /* DeviceActivity.framework */; };
+		AA00003DFF000000000000FF18 /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000070000000000000001A /* ManagedSettings.framework */; };
 		AA000040000000000000001B /* SpentActivityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000040000000000000001A /* SpentActivityMonitor.swift */; };
 		AA000041000000000000001B /* SpentActivityMonitor.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = AA000041000000000000001A /* SpentActivityMonitor.entitlements */; };
 		AA00004DFF000000000000016B /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000017000000000000001A /* DeviceActivity.framework */; };
@@ -132,6 +138,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA00003DFF000000000000FF16 /* DeviceActivity.framework in Frameworks */,
+				AA00003DFF000000000000FF18 /* ManagedSettings.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -573,6 +581,10 @@
 			files = (
 				AA000030000000000000001B /* SpentActivityReportExtension.swift in Sources */,
 				AA000031000000000000001B /* TotalActivityView.swift in Sources */,
+				AA00003DFF000000000000FF03 /* DailyReceipt.swift in Sources */,
+				AA00003DFF000000000000FF04 /* AppUsage.swift in Sources */,
+				AA00003DFF000000000000FF05 /* UserMode.swift in Sources */,
+				AA00003DFF000000000000FF1E /* CategoryClassifier.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
