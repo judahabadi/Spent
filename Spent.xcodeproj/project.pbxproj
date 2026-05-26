@@ -26,7 +26,6 @@
 		AA000012000000000000001B /* ShareableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000012000000000000001A /* ShareableImageView.swift */; };
 		AA000013000000000000001B /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000013000000000000001A /* AppViewModel.swift */; };
 		AA000014000000000000001B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000014000000000000001A /* Assets.xcassets */; };
-		AA000015000000000000001B /* Spent.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = AA000015000000000000001A /* Spent.entitlements */; };
 		AA000016000000000000001B /* FamilyControls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000016000000000000001A /* FamilyControls.framework */; };
 		AA000017000000000000001B /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000017000000000000001A /* DeviceActivity.framework */; };
 		AA000018000000000000001B /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000018000000000000001A /* CloudKit.framework */; };
@@ -38,12 +37,9 @@
 		AA00001F000000000000001B /* CategorySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00001F000000000000001A /* CategorySettingsView.swift */; };
 		AA000020000000000000001B /* SpentWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000020000000000000001A /* SpentWidgetsBundle.swift */; };
 		AA000021000000000000001B /* SpentWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000021000000000000001A /* SpentWidget.swift */; };
-		AA000022000000000000001B /* SpentWidgets.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = AA000022000000000000001A /* SpentWidgets.entitlements */; };
 		AA000030000000000000001B /* SpentActivityReportExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000030000000000000001A /* SpentActivityReportExtension.swift */; };
 		AA000031000000000000001B /* TotalActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000031000000000000001A /* TotalActivityView.swift */; };
-		AA000032000000000000001B /* SpentActivityReport.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = AA000032000000000000001A /* SpentActivityReport.entitlements */; };
 		AA000040000000000000001B /* SpentActivityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000040000000000000001A /* SpentActivityMonitor.swift */; };
-		AA000041000000000000001B /* SpentActivityMonitor.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = AA000041000000000000001A /* SpentActivityMonitor.entitlements */; };
 		AA00004DFF000000000000016B /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000017000000000000001A /* DeviceActivity.framework */; };
 		AA00004DFF000000000000017B /* FamilyControls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000016000000000000001A /* FamilyControls.framework */; };
 		AA00004DFF000000000000018B /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000070000000000000001A /* ManagedSettings.framework */; };
@@ -524,7 +520,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA000014000000000000001B /* Assets.xcassets in Resources */,
-				AA000015000000000000001B /* Spent.entitlements in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -532,7 +527,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA000022000000000000001B /* SpentWidgets.entitlements in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -540,7 +534,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA000032000000000000001B /* SpentActivityReport.entitlements in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -548,7 +541,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA000041000000000000001B /* SpentActivityMonitor.entitlements in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
