@@ -185,7 +185,7 @@
 			children = (
 				AAFFFFFF000000000000AAAA /* Spent */,
 				AAFFFFFF000000000000BBBB /* SpentWidgets */,
-				AAFFFFFF000000000000CCCC /* SpentActivityReport */,
+				AABB003000000000000000CC /* SpentActivityReport */,
 				AAFFFFFF000000000000DDDD /* SpentActivityMonitor */,
 				AAFFFFFF000000000000EEEE /* SpentTests */,
 				AAFFFFFF000000000000EEE0 /* SpentUITests */,
@@ -266,7 +266,7 @@
 			path = SpentWidgets;
 			sourceTree = "<group>";
 		};
-		AAFFFFFF000000000000CCCC /* SpentActivityReport */ = {
+		AABB003000000000000000CC /* SpentActivityReport */ = {
 			isa = PBXGroup;
 			children = (
 				AA000030000000000000001A /* SpentActivityReportExtension.swift */,
