@@ -59,8 +59,10 @@ final class StoreKitService {
                 expiry = transaction.expirationDate
                 // Check if in trial (StoreKit 2 doesn't expose trial directly in transaction)
                 // Use offerType to detect introductory offer
-                if transaction.offer?.type == .introductory {
-                    hasTrialing = true
+                if #available(iOS 17.2, *) {
+                    if transaction.offer?.type == .introductory {
+                        hasTrialing = true
+                    }
                 }
             }
         }
