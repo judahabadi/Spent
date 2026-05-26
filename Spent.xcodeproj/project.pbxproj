@@ -8,7 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		AA000001000000000000001B /* SpentApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000001A /* SpentApp.swift */; };
-		AA000002000000000000001B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000001A /* ContentView.swift */; };
+		AA00001E000000000000001B /* CategoryClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00001E000000000000001A /* CategoryClassifier.swift */; };
+		AA00001F000000000000001B /* CategorySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00001F000000000000001A /* CategorySettingsView.swift */; };
 		AA000003000000000000001B /* DailyReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000003000000000000001A /* DailyReceipt.swift */; };
 		AA000004000000000000001B /* AppUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000004000000000000001A /* AppUsage.swift */; };
 		AA000005000000000000001B /* UserMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000005000000000000001A /* UserMode.swift */; };
@@ -43,6 +44,9 @@
 		AA000032000000000000001B /* SpentActivityReport.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = AA000032000000000000001A /* SpentActivityReport.entitlements */; };
 		AA000040000000000000001B /* SpentActivityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000040000000000000001A /* SpentActivityMonitor.swift */; };
 		AA000041000000000000001B /* SpentActivityMonitor.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = AA000041000000000000001A /* SpentActivityMonitor.entitlements */; };
+		AA00004DFF000000000000016B /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000017000000000000001A /* DeviceActivity.framework */; };
+		AA00004DFF000000000000017B /* FamilyControls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000016000000000000001A /* FamilyControls.framework */; };
+		AA00004DFF000000000000018B /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000070000000000000001A /* ManagedSettings.framework */; };
 		AA000050000000000000001B /* SpentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000050000000000000001A /* SpentTests.swift */; };
 		AA000051000000000000001B /* CalculationEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000051000000000000001A /* CalculationEngineTests.swift */; };
 		AA000060000000000000001B /* SpentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000060000000000000001A /* SpentUITests.swift */; };
@@ -50,7 +54,8 @@
 
 /* Begin PBXFileReference section */
 		AA000001000000000000001A /* SpentApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpentApp.swift; sourceTree = "<group>"; };
-		AA000002000000000000001A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		AA00001E000000000000001A /* CategoryClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryClassifier.swift; sourceTree = "<group>"; };
+		AA00001F000000000000001A /* CategorySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySettingsView.swift; sourceTree = "<group>"; };
 		AA000003000000000000001A /* DailyReceipt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyReceipt.swift; sourceTree = "<group>"; };
 		AA000004000000000000001A /* AppUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUsage.swift; sourceTree = "<group>"; };
 		AA000005000000000000001A /* UserMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserMode.swift; sourceTree = "<group>"; };
@@ -78,6 +83,7 @@
 		AA00001A000000000000001A /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
 		AA00001B000000000000001A /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		AA00001C000000000000001A /* MetricKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetricKit.framework; path = System/Library/Frameworks/MetricKit.framework; sourceTree = SDKROOT; };
+		AA000070000000000000001A /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
 		AA00001D000000000000001A /* Spent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Spent.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA000020000000000000001A /* SpentWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpentWidgetsBundle.swift; sourceTree = "<group>"; };
 		AA000021000000000000001A /* SpentWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpentWidget.swift; sourceTree = "<group>"; };
@@ -133,6 +139,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA00004DFF000000000000016B /* DeviceActivity.framework in Frameworks */,
+				AA00004DFF000000000000017B /* FamilyControls.framework in Frameworks */,
+				AA00004DFF000000000000018B /* ManagedSettings.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -176,6 +185,7 @@
 				AA00001A000000000000001A /* AuthenticationServices.framework */,
 				AA00001B000000000000001A /* WidgetKit.framework */,
 				AA00001C000000000000001A /* MetricKit.framework */,
+				AA000070000000000000001A /* ManagedSettings.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -198,7 +208,6 @@
 			isa = PBXGroup;
 			children = (
 				AA000001000000000000001A /* SpentApp.swift */,
-				AA000002000000000000001A /* ContentView.swift */,
 				AAFFFFFF000000000000AAA1 /* Models */,
 				AAFFFFFF000000000000AAA2 /* Services */,
 				AAFFFFFF000000000000AAA3 /* Views */,
@@ -230,6 +239,7 @@
 				AA00000A000000000000001A /* AuthService.swift */,
 				AA00000B000000000000001A /* StoreKitService.swift */,
 				AA00000C000000000000001A /* NotificationService.swift */,
+				AA00001E000000000000001A /* CategoryClassifier.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -243,6 +253,7 @@
 				AA000010000000000000001A /* PaywallView.swift */,
 				AA000011000000000000001A /* PermissionDeniedView.swift */,
 				AA000012000000000000001A /* ShareableImageView.swift */,
+				AA00001F000000000000001A /* CategorySettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -525,7 +536,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA000001000000000000001B /* SpentApp.swift in Sources */,
-				AA000002000000000000001B /* ContentView.swift in Sources */,
+				AA00001E000000000000001B /* CategoryClassifier.swift in Sources */,
+				AA00001F000000000000001B /* CategorySettingsView.swift in Sources */,
 				AA000003000000000000001B /* DailyReceipt.swift in Sources */,
 				AA000004000000000000001B /* AppUsage.swift in Sources */,
 				AA000005000000000000001B /* UserMode.swift in Sources */,
