@@ -39,16 +39,6 @@ struct TotalActivityReport: DeviceActivityReportScene {
         }
 
         for await activityData in data {
-            // Primary: direct category access (works for ongoing intervals)
-            for await categoryActivity in activityData.categories {
-                for await appActivity in categoryActivity.applications {
-                    let bundleID = appActivity.application.bundleIdentifier ?? "unknown"
-                    let name = appActivity.application.localizedDisplayName ?? bundleID
-                    accumulate(bundleID: bundleID, displayName: name, duration: appActivity.totalActivityDuration)
-                }
-            }
-
-            // Fallback: segment-based access (works for completed intervals)
             for await segment in activityData.activitySegments {
                 for await categoryActivity in segment.categories {
                     for await appActivity in categoryActivity.applications {
@@ -84,7 +74,7 @@ struct TotalActivityView: View {
     var body: some View {
         Color.clear
             .onAppear { persist() }
-            .onChange(of: configuration.appUsages.count) { persist() }
+            .onChange(of: configuration.appUsages.count) { _, _ in persist() }
     }
 
     private func persist() {
@@ -163,7 +153,10 @@ struct SpentSettings: Codable {
     }
 
     enum RatePeriod: String, Codable, CaseIterable {
-        case hourly, daily, weekly, monthly
+        case hourly = "Hourly"
+        case daily = "Daily"
+        case weekly = "Weekly"
+        case monthly = "Monthly"
         var hours: Double {
             switch self { case .hourly: 1; case .daily: 8; case .weekly: 40; case .monthly: 160 }
         }
@@ -173,13 +166,15 @@ struct SpentSettings: Codable {
 // MARK: - CategoryClassifier
 
 // Reads per-app category overrides the user set in the main app (stored in the shared App Group).
-struct CategoryClassifier {
+struct CategoryClassifier: Codable {
+    var overrides: [String: AppCategory] = [:]
+
     static func classify(bundleID: String) -> AppCategory {
         let defaults = UserDefaults(suiteName: "group.app.spent")
-        guard let raw = defaults?.string(forKey: "category.\(bundleID)"),
-              let category = AppCategory(rawValue: raw) else {
+        guard let data = defaults?.data(forKey: "spent.categoryOverrides"),
+              let classifier = try? JSONDecoder().decode(CategoryClassifier.self, from: data) else {
             return .neutral
         }
-        return category
+        return classifier.overrides[bundleID] ?? .neutral
     }
 }
