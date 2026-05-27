@@ -7,7 +7,16 @@ struct ReceiptView: View {
 
     var body: some View {
         ZStack {
-            activityReportCollector
+            // DeviceActivityReport must have a non-trivial frame and non-zero opacity
+            // so the system allocates resources for the extension process.
+            // No filter: receive all data from all active monitoring schedules.
+            DeviceActivityReport(.init("totalActivity"))
+                .id(appVM.reportRefreshID)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .opacity(0.001)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+
             GeometryReader { geo in
                 if geo.size.width > 700 {
                     HStack(spacing: 0) {
@@ -31,22 +40,6 @@ struct ReceiptView: View {
         }
     }
 
-    // Embedded off-screen to trigger the DeviceActivityReport extension,
-    // which reads live screen time data and persists it to the App Group.
-    private var activityReportCollector: some View {
-        let today = Calendar.current.dateInterval(of: .day, for: .now)
-            ?? DateInterval(start: Calendar.current.startOfDay(for: .now), duration: 86400)
-        return DeviceActivityReport(
-            .init("totalActivity"),
-            filter: DeviceActivityFilter(segment: .daily(during: today))
-        )
-        .id(appVM.reportRefreshID)
-        .frame(width: 1, height: 1)
-        .clipped()
-        .allowsHitTesting(false)
-        .accessibilityHidden(true)
-    }
-
     private var receiptPane: some View {
         ScrollView {
             VStack(spacing: 0) {
@@ -57,12 +50,6 @@ struct ReceiptView: View {
                     .padding(.bottom, 40)
             }
         }
-        .background(
-            DeviceActivityReport(.init("totalActivity"))
-                .id(appVM.reportRefreshID)
-                .opacity(0)
-                .allowsHitTesting(false)
-        )
     }
 
     private var headerBar: some View {
