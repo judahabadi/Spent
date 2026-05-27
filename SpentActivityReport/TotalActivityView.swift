@@ -27,6 +27,7 @@ struct TotalActivityReport: DeviceActivityReportScene {
 
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> ReceiptConfiguration {
         var totals: [String: (displayName: String, minutes: Int)] = [:]
+        var scheduleCount = 0, segmentCount = 0, categoryCount = 0, appCount = 0
 
         func accumulate(bundleID: String, displayName: String, duration: TimeInterval) {
             let minutes = Int(duration / 60)
@@ -39,9 +40,13 @@ struct TotalActivityReport: DeviceActivityReportScene {
         }
 
         for await activityData in data {
+            scheduleCount += 1
             for await segment in activityData.activitySegments {
+                segmentCount += 1
                 for await categoryActivity in segment.categories {
+                    categoryCount += 1
                     for await appActivity in categoryActivity.applications {
+                        appCount += 1
                         let bundleID = appActivity.application.bundleIdentifier ?? "unknown"
                         let name = appActivity.application.localizedDisplayName ?? bundleID
                         accumulate(bundleID: bundleID, displayName: name, duration: appActivity.totalActivityDuration)
@@ -49,6 +54,10 @@ struct TotalActivityReport: DeviceActivityReportScene {
                 }
             }
         }
+
+        let defaults = UserDefaults(suiteName: "group.app.spent")
+        defaults?.set("schedules=\(scheduleCount) segments=\(segmentCount) categories=\(categoryCount) apps=\(appCount)", forKey: "spent.diagnostics")
+        defaults?.set(Date.now.timeIntervalSince1970, forKey: "spent.diagnostics.ts")
 
         let settings = SpentSettings.load()
         let appUsages = totals.map { bundleID, info in
