@@ -3,12 +3,18 @@ import SwiftUI
 @main
 struct SpentApp: App {
     @State private var appVM = AppViewModel()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environment(appVM)
                 .preferredColorScheme(nil) // follows system
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                appVM.screenTime.recheckAuthorization()
+            }
         }
     }
 }

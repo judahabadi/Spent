@@ -11,20 +11,26 @@ final class ScreenTimeService {
     private let center = AuthorizationCenter.shared
     private let deviceActivityCenter = DeviceActivityCenter()
 
+    var authorizationStatus: AuthorizationStatus = AuthorizationCenter.shared.authorizationStatus
+
     func requestAuthorization() async {
         do {
             try await center.requestAuthorization(for: .individual)
-            await MainActor.run { isAuthorized = true }
+            await MainActor.run {
+                self.authorizationStatus = self.center.authorizationStatus
+                isAuthorized = true
+            }
         } catch {
             await MainActor.run {
+                self.authorizationStatus = self.center.authorizationStatus
                 self.authError = error
                 self.isAuthorized = false
             }
         }
     }
 
-    var authorizationStatus: AuthorizationStatus {
-        center.authorizationStatus
+    func recheckAuthorization() {
+        authorizationStatus = center.authorizationStatus
     }
 
     // Start monitoring to populate DeviceActivity data
