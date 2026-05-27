@@ -14,6 +14,7 @@ struct SettingsView: View {
                 securitySection
                 accountSection
                 subscriptionSection
+                diagnosticsSection
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -163,6 +164,24 @@ struct SettingsView: View {
             } label: {
                 Text("Delete Account")
             }
+        }
+    }
+
+    private var diagnosticsSection: some View {
+        let defaults = UserDefaults(suiteName: "group.app.spent")
+        let diag = defaults?.string(forKey: "spent.diagnostics") ?? "not yet run"
+        let ts = defaults?.double(forKey: "spent.diagnostics.ts") ?? 0
+        let timeStr = ts > 0 ? Date(timeIntervalSince1970: ts).formatted(.dateTime.hour().minute().second()) : "—"
+        return Section(header: Text("Screen Time Debug")) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(diag)
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                Text("Last run: \(timeStr)")
+                    .font(.system(size: 10, design: .monospaced))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(.vertical, 4)
         }
     }
 
