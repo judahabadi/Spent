@@ -36,6 +36,10 @@
     </array>
     <key>NSFaceIDUsageDescription</key>
     <string>Spent uses Face ID to lock your financial data.</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleIconName</key>
+    <string>AppIcon</string>
     <key>ITSAppUsesNonExemptEncryption</key>
     <false/>
 </dict>
