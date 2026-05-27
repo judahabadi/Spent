@@ -77,15 +77,11 @@ final class AppViewModel {
         await cloudKit.save(streak: streak)
     }
 
-    var settings: SpentSettings {
-        get { SpentSettings.load() }
-        set { newValue.save() }
-    }
+    var settings: SpentSettings = SpentSettings.load()
 
     func updateSettings(_ block: (inout SpentSettings) -> Void) {
-        var s = settings
-        block(&s)
-        s.save()
+        block(&settings)
+        settings.save()
     }
 }
 
