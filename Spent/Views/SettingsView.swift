@@ -11,7 +11,6 @@ struct SettingsView: View {
             List {
                 rateSection
                 notificationsSection
-                sessionSection
                 securitySection
                 accountSection
                 subscriptionSection
@@ -46,10 +45,12 @@ struct SettingsView: View {
             Picker("Mode", selection: Binding(
                 get: { appVM.settings.userMode.isStudent },
                 set: { isStudent in
-                    appVM.updateSettings { s in
-                        s.userMode = isStudent
-                            ? .student(currentGPA: 3.5, scale: .deviceDefault)
-                            : .standard(hourlyRate: s.wage)
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        appVM.updateSettings { s in
+                            s.userMode = isStudent
+                                ? .student(currentGPA: 3.5, scale: .deviceDefault)
+                                : .standard(hourlyRate: s.wage)
+                        }
                     }
                 }
             )) {
@@ -58,7 +59,38 @@ struct SettingsView: View {
             }
             .pickerStyle(.segmented)
 
-            if !appVM.settings.userMode.isStudent {
+            if appVM.settings.userMode.isStudent {
+                HStack {
+                    Text("Current GPA")
+                    Spacer()
+                    TextField("3.5", value: Binding(
+                        get: { appVM.settings.currentGPA },
+                        set: { v in appVM.updateSettings { $0.currentGPA = v } }
+                    ), format: .number)
+                    .multilineTextAlignment(.trailing)
+                    .keyboardType(.decimalPad)
+                    .frame(width: 80)
+                }
+
+                Picker("Scale", selection: Binding(
+                    get: { appVM.settings.gpaScale },
+                    set: { v in appVM.updateSettings { $0.gpaScale = v } }
+                )) {
+                    ForEach(GPAScale.allCases, id: \.self) { s in
+                        Text(s.label).tag(s)
+                    }
+                }
+
+                Stepper(
+                    "Session: \(appVM.settings.studentSessionMinutes) min",
+                    value: Binding(
+                        get: { appVM.settings.studentSessionMinutes },
+                        set: { v in appVM.updateSettings { $0.studentSessionMinutes = v } }
+                    ),
+                    in: 15...120,
+                    step: 5
+                )
+            } else {
                 HStack {
                     Text("Wage")
                     Spacer()
@@ -105,26 +137,6 @@ struct SettingsView: View {
                 ),
                 displayedComponents: .hourAndMinute
             )
-        }
-    }
-
-    private var sessionSection: some View {
-        Section("Study Sessions") {
-            if appVM.settings.userMode.isStudent {
-                Stepper(
-                    "Session length: \(appVM.settings.studentSessionMinutes) min",
-                    value: Binding(
-                        get: { appVM.settings.studentSessionMinutes },
-                        set: { v in appVM.updateSettings { $0.studentSessionMinutes = v } }
-                    ),
-                    in: 15...120,
-                    step: 5
-                )
-            } else {
-                Text("Switch to Student mode to configure sessions")
-                    .foregroundStyle(.secondary)
-                    .font(.system(size: 13, design: .monospaced))
-            }
         }
     }
 
