@@ -22,8 +22,12 @@ final class AppViewModel {
 
     // Live update timer
     private var updateTimer: Timer?
+    private var isInitializing = false
 
     func initialize() async {
+        guard !isInitializing else { return }
+        isInitializing = true
+        defer { isInitializing = false }
         await screenTime.requestAuthorization()
         if auth.isSignedIn {
             if settings.trialStartDate == nil {
