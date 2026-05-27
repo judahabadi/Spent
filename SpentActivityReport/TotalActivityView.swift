@@ -28,20 +28,33 @@ struct TotalActivityReport: DeviceActivityReportScene {
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> ReceiptConfiguration {
         var totals: [String: (displayName: String, minutes: Int)] = [:]
 
+        func accumulate(bundleID: String, displayName: String, duration: TimeInterval) {
+            let minutes = Int(duration / 60)
+            guard minutes > 0 else { return }
+            if let existing = totals[bundleID] {
+                totals[bundleID] = (existing.displayName, existing.minutes + minutes)
+            } else {
+                totals[bundleID] = (displayName, minutes)
+            }
+        }
+
         for await activityData in data {
+            // Primary: direct category access (works for ongoing intervals)
+            for await categoryActivity in activityData.categories {
+                for await appActivity in categoryActivity.applications {
+                    let bundleID = appActivity.application.bundleIdentifier ?? "unknown"
+                    let name = appActivity.application.localizedDisplayName ?? bundleID
+                    accumulate(bundleID: bundleID, displayName: name, duration: appActivity.totalActivityDuration)
+                }
+            }
+
+            // Fallback: segment-based access (works for completed intervals)
             for await segment in activityData.activitySegments {
                 for await categoryActivity in segment.categories {
                     for await appActivity in categoryActivity.applications {
                         let bundleID = appActivity.application.bundleIdentifier ?? "unknown"
-                        let displayName = appActivity.application.localizedDisplayName ?? bundleID
-                        let minutes = Int(appActivity.totalActivityDuration / 60)
-                        guard minutes > 0 else { continue }
-
-                        if let existing = totals[bundleID] {
-                            totals[bundleID] = (existing.displayName, existing.minutes + minutes)
-                        } else {
-                            totals[bundleID] = (displayName, minutes)
-                        }
+                        let name = appActivity.application.localizedDisplayName ?? bundleID
+                        accumulate(bundleID: bundleID, displayName: name, duration: appActivity.totalActivityDuration)
                     }
                 }
             }
@@ -71,6 +84,7 @@ struct TotalActivityView: View {
     var body: some View {
         Color.clear
             .onAppear { persist() }
+            .onChange(of: configuration.appUsages.count) { persist() }
     }
 
     private func persist() {

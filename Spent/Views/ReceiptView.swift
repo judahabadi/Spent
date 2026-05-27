@@ -6,28 +6,45 @@ struct ReceiptView: View {
     @State private var showCalendar = false
 
     var body: some View {
-        GeometryReader { geo in
-            if geo.size.width > 700 {
-                // iPad: split layout
-                HStack(spacing: 0) {
+        ZStack {
+            activityReportCollector
+            GeometryReader { geo in
+                if geo.size.width > 700 {
+                    HStack(spacing: 0) {
+                        receiptPane
+                            .frame(maxWidth: .infinity)
+                        Divider()
+                        statsPanel
+                            .frame(width: 300)
+                    }
+                } else {
                     receiptPane
-                        .frame(maxWidth: .infinity)
-                    Divider()
-                    statsPanel
-                        .frame(width: 300)
                 }
-            } else {
-                // iPhone: full receipt
-                receiptPane
             }
+            .background(Color(.systemBackground))
         }
-        .background(Color(.systemBackground))
         .fullScreenCover(isPresented: Bindable(appVM).isShowingSettings) {
             SettingsView()
         }
         .sheet(isPresented: Bindable(appVM).isShowingPaywall) {
             PaywallView()
         }
+    }
+
+    // Embedded off-screen to trigger the DeviceActivityReport extension,
+    // which reads live screen time data and persists it to the App Group.
+    private var activityReportCollector: some View {
+        let today = Calendar.current.dateInterval(of: .day, for: .now)
+            ?? DateInterval(start: Calendar.current.startOfDay(for: .now), duration: 86400)
+        return DeviceActivityReport(
+            .init("totalActivity"),
+            filter: DeviceActivityFilter(segment: .daily(during: today))
+        )
+        .id(appVM.reportRefreshID)
+        .frame(width: 1, height: 1)
+        .clipped()
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 
     private var receiptPane: some View {
