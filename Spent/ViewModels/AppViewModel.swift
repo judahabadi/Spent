@@ -28,6 +28,7 @@ final class AppViewModel {
             if settings.trialStartDate == nil {
                 updateSettings { $0.trialStartDate = Date.now }
             }
+            screenTime.startMonitoring()
             streak = await cloudKit.fetchStreak()
             await loadTodayReceipt()
             startLiveUpdates()
@@ -131,9 +132,10 @@ struct SpentSettings: Codable {
     }
 
     private static let key = "spent.settings"
+    private static let suite = UserDefaults(suiteName: "group.app.spent")
 
     static func load() -> SpentSettings {
-        guard let data = UserDefaults.standard.data(forKey: key),
+        guard let data = suite?.data(forKey: key),
               let settings = try? JSONDecoder().decode(SpentSettings.self, from: data) else {
             return SpentSettings()
         }
@@ -142,7 +144,7 @@ struct SpentSettings: Codable {
 
     func save() {
         guard let data = try? JSONEncoder().encode(self) else { return }
-        UserDefaults.standard.set(data, forKey: Self.key)
+        Self.suite?.set(data, forKey: Self.key)
     }
 
     enum RatePeriod: String, Codable, CaseIterable {

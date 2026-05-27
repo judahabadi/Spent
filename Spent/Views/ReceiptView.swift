@@ -1,4 +1,5 @@
 import SwiftUI
+import DeviceActivity
 
 struct ReceiptView: View {
     @Environment(AppViewModel.self) private var appVM
@@ -39,6 +40,10 @@ struct ReceiptView: View {
                     .padding(.bottom, 40)
             }
         }
+        .background(
+            DeviceActivityReport(.init("totalActivity"))
+                .hidden()
+        )
     }
 
     private var headerBar: some View {
