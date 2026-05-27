@@ -40,12 +40,12 @@ struct TotalActivityReport: DeviceActivityReportScene {
 
         for await activityData in data {
             for await segment in activityData.activitySegments {
-                for await categoryActivity in segment.categories {
-                    for await appActivity in categoryActivity.applications {
-                        let bundleID = appActivity.application.bundleIdentifier ?? "unknown"
-                        let name = appActivity.application.localizedDisplayName ?? bundleID
-                        accumulate(bundleID: bundleID, displayName: name, duration: appActivity.totalActivityDuration)
-                    }
+                // Use segment.applications directly — segment.categories is empty for apps
+                // without an Apple-assigned category, so the nested path produces nothing.
+                for await appActivity in segment.applications {
+                    let bundleID = appActivity.application.bundleIdentifier ?? "unknown"
+                    let name = appActivity.application.localizedDisplayName ?? bundleID
+                    accumulate(bundleID: bundleID, displayName: name, duration: appActivity.totalActivityDuration)
                 }
             }
         }
