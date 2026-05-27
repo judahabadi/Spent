@@ -39,16 +39,6 @@ struct TotalActivityReport: DeviceActivityReportScene {
         }
 
         for await activityData in data {
-            // Primary: direct category access (works for ongoing intervals)
-            for await categoryActivity in activityData.categories {
-                for await appActivity in categoryActivity.applications {
-                    let bundleID = appActivity.application.bundleIdentifier ?? "unknown"
-                    let name = appActivity.application.localizedDisplayName ?? bundleID
-                    accumulate(bundleID: bundleID, displayName: name, duration: appActivity.totalActivityDuration)
-                }
-            }
-
-            // Fallback: segment-based access (works for completed intervals)
             for await segment in activityData.activitySegments {
                 for await categoryActivity in segment.categories {
                     for await appActivity in categoryActivity.applications {
