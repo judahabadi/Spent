@@ -146,7 +146,7 @@ struct ReceiptView: View {
                 .foregroundStyle(.secondary)
                 .frame(width: 60, alignment: .trailing)
 
-            if appVM.storeKit.isDegraded {
+            if appVM.isDegraded {
                 Text("$--.--")
                     .font(.system(size: 11, design: .monospaced))
                     .blur(radius: 3)
@@ -185,8 +185,25 @@ struct ReceiptView: View {
             Divider().padding(.vertical, 6)
             netTotalRow
             streakRow
+            trialBanner
         }
         .padding(.vertical, 12)
+    }
+
+    @ViewBuilder
+    private var trialBanner: some View {
+        if !appVM.storeKit.isSubscribed, let trialStart = appVM.settings.trialStartDate {
+            let daysUsed = Calendar.current.dateComponents([.day], from: trialStart, to: .now).day ?? 0
+            let daysLeft = max(0, 7 - daysUsed)
+            if daysLeft > 0 {
+                Button { appVM.isShowingPaywall = true } label: {
+                    Text("FREE TRIAL — \(daysLeft) DAY\(daysLeft == 1 ? "" : "S") LEFT")
+                        .font(.system(size: 9, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.top, 6)
+            }
+        }
     }
 
     private func totalRow(label: String, value: Double, negative: Bool) -> some View {
@@ -194,7 +211,7 @@ struct ReceiptView: View {
             Text(label)
                 .font(.system(size: 11, design: .monospaced))
             Spacer()
-            if appVM.storeKit.isDegraded {
+            if appVM.isDegraded {
                 Text("$--.--")
                     .font(.system(size: 11, design: .monospaced))
                     .blur(radius: 3)
@@ -216,7 +233,7 @@ struct ReceiptView: View {
             Text(isProfitDay ? "YOU EARNED" : "TOTAL DUE")
                 .font(.system(size: 13, weight: .bold, design: .monospaced))
             Spacer()
-            if appVM.storeKit.isDegraded {
+            if appVM.isDegraded {
                 Button { appVM.isShowingPaywall = true } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "lock.fill").font(.system(size: 10))

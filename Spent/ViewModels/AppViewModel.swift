@@ -25,10 +25,20 @@ final class AppViewModel {
     func initialize() async {
         await screenTime.requestAuthorization()
         if auth.isSignedIn {
+            if settings.trialStartDate == nil {
+                updateSettings { $0.trialStartDate = Date.now }
+            }
             streak = await cloudKit.fetchStreak()
             await loadTodayReceipt()
             startLiveUpdates()
         }
+    }
+
+    var isDegraded: Bool {
+        if storeKit.isSubscribed || storeKit.isTrialing { return false }
+        guard let trialStart = settings.trialStartDate else { return true }
+        let days = Calendar.current.dateComponents([.day], from: trialStart, to: .now).day ?? 0
+        return days >= 7
     }
 
     func loadTodayReceipt() async {
@@ -87,6 +97,7 @@ struct SpentSettings: Codable {
     var notificationMinute: Int = 0
     var studentSessionMinutes: Int = 45
     var appLockEnabled: Bool = false
+    var trialStartDate: Date? = nil
 
     var hourlyRate: Double {
         switch userMode {
