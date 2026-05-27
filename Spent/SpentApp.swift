@@ -14,6 +14,9 @@ struct SpentApp: App {
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 appVM.screenTime.recheckAuthorization()
+                if appVM.auth.isSignedIn {
+                    Task { await appVM.initialize() }
+                }
             }
         }
     }
@@ -34,6 +37,11 @@ struct RootView: View {
         }
         .task {
             await appVM.initialize()
+        }
+        .onChange(of: appVM.auth.isSignedIn) { _, isSignedIn in
+            if isSignedIn {
+                Task { await appVM.initialize() }
+            }
         }
     }
 }

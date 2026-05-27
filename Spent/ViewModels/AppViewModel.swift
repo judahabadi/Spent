@@ -18,6 +18,7 @@ final class AppViewModel {
     var isShowingSettings = false
     var isShowingPaywall = false
     var receiptHistory: [DailyReceipt] = []
+    var reportRefreshID = UUID()
 
     // Live update timer
     private var updateTimer: Timer?
@@ -54,7 +55,12 @@ final class AppViewModel {
     func startLiveUpdates() {
         updateTimer?.invalidate()
         updateTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
-            Task { await self?.loadTodayReceipt() }
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.reportRefreshID = UUID()
+                try? await Task.sleep(for: .seconds(3))
+                await self.loadTodayReceipt()
+            }
         }
     }
 
@@ -71,15 +77,11 @@ final class AppViewModel {
         await cloudKit.save(streak: streak)
     }
 
-    var settings: SpentSettings {
-        get { SpentSettings.load() }
-        set { newValue.save() }
-    }
+    var settings: SpentSettings = SpentSettings.load()
 
     func updateSettings(_ block: (inout SpentSettings) -> Void) {
-        var s = settings
-        block(&s)
-        s.save()
+        block(&settings)
+        settings.save()
     }
 }
 

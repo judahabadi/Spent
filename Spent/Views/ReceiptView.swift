@@ -42,7 +42,9 @@ struct ReceiptView: View {
         }
         .background(
             DeviceActivityReport(.init("totalActivity"))
-                .hidden()
+                .id(appVM.reportRefreshID)
+                .opacity(0)
+                .allowsHitTesting(false)
         )
     }
 
