@@ -12,8 +12,8 @@ struct OnboardingView: View {
 
             TabView(selection: $page) {
                 hookScreen.tag(0)
-                signInScreen.tag(1)
-                rateSetupScreen.tag(2)
+                rateSetupScreen.tag(1)
+                signInScreen.tag(2)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
 
@@ -88,7 +88,6 @@ struct OnboardingView: View {
                 request.requestedScopes = [.fullName, .email]
             } onCompletion: { result in
                 appVM.auth.handleAppleSignIn(result: result)
-                if appVM.auth.isSignedIn { withAnimation { page = 2 } }
             }
             .signInWithAppleButtonStyle(.whiteOutline)
             .frame(height: 50)
@@ -140,12 +139,9 @@ struct OnboardingView: View {
             Spacer()
 
             Button {
-                Task {
-                    await appVM.screenTime.requestAuthorization()
-                    await appVM.initialize()
-                }
+                withAnimation { page = 2 }
             } label: {
-                Text("Grant Access")
+                Text("Continue")
                     .font(.system(size: 16, weight: .semibold, design: .monospaced))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
