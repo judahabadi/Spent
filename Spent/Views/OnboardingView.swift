@@ -161,8 +161,10 @@ struct OnboardingView: View {
         Picker("Mode", selection: Binding(
             get: { isStudent },
             set: { newVal in
-                appVM.updateSettings { s in
-                    s.userMode = newVal ? .student(currentGPA: 3.5, scale: .deviceDefault) : .standard(hourlyRate: s.wage)
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    appVM.updateSettings { s in
+                        s.userMode = newVal ? .student(currentGPA: 3.5, scale: .deviceDefault) : .standard(hourlyRate: s.wage)
+                    }
                 }
             }
         )) {
@@ -175,10 +177,42 @@ struct OnboardingView: View {
     @ViewBuilder
     private var rateInputs: some View {
         if appVM.settings.userMode.isStudent {
-            Text("We'll track your GPA impact, not your wages")
-                .font(.system(size: 13, design: .monospaced))
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+            VStack(spacing: 12) {
+                HStack {
+                    Text("Current GPA")
+                        .font(.system(size: 13, design: .monospaced))
+                    Spacer()
+                    TextField("3.5", value: Binding(
+                        get: { appVM.settings.currentGPA },
+                        set: { v in appVM.updateSettings { $0.currentGPA = v } }
+                    ), format: .number)
+                    .keyboardType(.decimalPad)
+                    .multilineTextAlignment(.trailing)
+                    .font(.system(size: 13, design: .monospaced))
+                    .frame(width: 80)
+                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+
+                HStack {
+                    Text("Session length")
+                        .font(.system(size: 13, design: .monospaced))
+                    Spacer()
+                    Stepper("\(appVM.settings.studentSessionMinutes) min", value: Binding(
+                        get: { appVM.settings.studentSessionMinutes },
+                        set: { v in appVM.updateSettings { $0.studentSessionMinutes = v } }
+                    ), in: 15...120, step: 5)
+                    .font(.system(size: 13, design: .monospaced))
+                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+            }
+            .transition(.asymmetric(
+                insertion: .move(edge: .trailing).combined(with: .opacity),
+                removal: .move(edge: .leading).combined(with: .opacity)
+            ))
         } else {
             VStack(spacing: 12) {
                 HStack {
@@ -208,6 +242,10 @@ struct OnboardingView: View {
                 }
                 .pickerStyle(.segmented)
             }
+            .transition(.asymmetric(
+                insertion: .move(edge: .trailing).combined(with: .opacity),
+                removal: .move(edge: .leading).combined(with: .opacity)
+            ))
         }
     }
 

@@ -95,6 +95,30 @@ struct SpentSettings: Codable {
         }
     }
 
+    var currentGPA: Double {
+        get {
+            if case .student(let gpa, _) = userMode { return gpa }
+            return 3.5
+        }
+        set {
+            if case .student(_, let scale) = userMode {
+                userMode = .student(currentGPA: newValue, scale: scale)
+            }
+        }
+    }
+
+    var gpaScale: GPAScale {
+        get {
+            if case .student(_, let scale) = userMode { return scale }
+            return .deviceDefault
+        }
+        set {
+            if case .student(let gpa, _) = userMode {
+                userMode = .student(currentGPA: gpa, scale: newValue)
+            }
+        }
+    }
+
     private static let key = "spent.settings"
 
     static func load() -> SpentSettings {
