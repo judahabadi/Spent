@@ -32,17 +32,18 @@ final class StoreKitService {
         }
     }
 
-    func purchase(_ product: Product) async throws {
+    func purchase(_ product: Product) async throws -> Bool {
         let result = try await product.purchase()
         switch result {
         case .success(let verification):
             let transaction = try checkVerified(verification)
             await updateSubscriptionStatus()
             await transaction.finish()
+            return true
         case .userCancelled, .pending:
-            break
+            return false
         @unknown default:
-            break
+            return false
         }
     }
 
