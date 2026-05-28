@@ -37,3 +37,15 @@ Read this at the start of every session before doing anything else.
 **Active branch for Claude sessions:** `claude/bold-ride-UUXj4`
 
 ---
+
+## 2026-05-28 — CLAUDE.md Created
+
+**Decision:** Create `CLAUDE.md` as a Claude Code–specific developer guide, separate from `README.md`.
+
+**Why:** `README.md` covers user-facing project info and one-time setup. `CLAUDE.md` is for the AI agent — it captures non-obvious constraints, the data flow between extensions, gotchas that have caused bugs (invisible DeviceActivityReport sizing, hourly vs daily schedules, extension embedding), and the exact files to touch for each concern. Without this, each session requires re-exploring the codebase.
+
+**What's in it:** Architecture, data flow, key files table, build/test commands, 10 explicit gotchas, entitlements matrix, branch strategy, link back to MEMORY.md.
+
+**Rejected:** Embedding all this in MEMORY.md (wrong audience — MEMORY.md is decision history, not a how-to guide) or expanding README.md (README is for humans setting up the project, not for AI context).
+
+---
