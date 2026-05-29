@@ -46,8 +46,6 @@
 		AA000050000000000000001B /* SpentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000050000000000000001A /* SpentTests.swift */; };
 		AA000051000000000000001B /* CalculationEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000051000000000000001A /* CalculationEngineTests.swift */; };
 		AA000060000000000000001B /* SpentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000060000000000000001A /* SpentUITests.swift */; };
-		AA00003D000000000000001B /* SpentActivityReport.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA00003D000000000000001A /* SpentActivityReport.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		AA00004D000000000000001B /* SpentActivityMonitor.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA00004D000000000000001A /* SpentActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -142,20 +140,6 @@
 		AA000070000000000000001A /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		AA00001D0000000000000040 /* Embed App Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				AA00003D000000000000001B /* SpentActivityReport.appex in Embed App Extensions */,
-				AA00004D000000000000001B /* SpentActivityMonitor.appex in Embed App Extensions */,
-			);
-			name = "Embed App Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		AA00001D0000000000000010 /* Frameworks */ = {
@@ -376,7 +360,6 @@
 				AA00001D0000000000000020 /* Sources */,
 				AA00001D0000000000000010 /* Frameworks */,
 				AA00001D0000000000000030 /* Resources */,
-				AA00001D0000000000000040 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
