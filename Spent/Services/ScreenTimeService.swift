@@ -33,37 +33,33 @@ final class ScreenTimeService {
         authorizationStatus = center.authorizationStatus
     }
 
-    // Start 24 hourly monitoring schedules so each completed hour produces a segment
-    // in DeviceActivityResults. A single daily schedule only creates a segment at 11:59PM,
-    // leaving activitySegments empty for the entire day.
+    // A single full-day schedule keeps Screen Time recording active for this app.
+    // Apple caps monitoring at 20 simultaneous activities, and data segmentation is
+    // driven by the report's DeviceActivityFilter — not by the number of schedules —
+    // so one schedule is sufficient and stays well under the limit.
     func startMonitoring() {
-        deviceActivityCenter.stopMonitoring([.daily])
-        var started = 0
-        var failed = 0
-        for hour in 0...23 {
-            let schedule = DeviceActivitySchedule(
-                intervalStart: DateComponents(hour: hour, minute: 0),
-                intervalEnd: DateComponents(hour: hour, minute: 59),
-                repeats: true
-            )
-            do {
-                try deviceActivityCenter.startMonitoring(
-                    DeviceActivityName.hour(hour),
-                    during: schedule
-                )
-                started += 1
-            } catch {
-                failed += 1
-            }
-        }
+        // Clean up the legacy 24-hourly schedules from older builds.
+        let legacyNames = (0...23).map { DeviceActivityName.hour($0) }
+        deviceActivityCenter.stopMonitoring(legacyNames + [.daily])
+
+        let schedule = DeviceActivitySchedule(
+            intervalStart: DateComponents(hour: 0, minute: 0),
+            intervalEnd: DateComponents(hour: 23, minute: 59),
+            repeats: true
+        )
         let defaults = UserDefaults(suiteName: "group.app.spent")
-        defaults?.set("schedules started=\(started) failed=\(failed)", forKey: "spent.monitoring.diagnostics")
+        do {
+            try deviceActivityCenter.startMonitoring(.daily, during: schedule)
+            defaults?.set("schedule started ok (daily)", forKey: "spent.monitoring.diagnostics")
+        } catch {
+            defaults?.set("schedule FAILED: \(error.localizedDescription)", forKey: "spent.monitoring.diagnostics")
+        }
         defaults?.set(Date.now.timeIntervalSince1970, forKey: "spent.monitoring.diagnostics.ts")
     }
 
     func stopMonitoring() {
         let names = (0...23).map { DeviceActivityName.hour($0) }
-        deviceActivityCenter.stopMonitoring(names)
+        deviceActivityCenter.stopMonitoring(names + [.daily])
     }
 }
 
