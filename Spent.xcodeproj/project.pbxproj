@@ -43,6 +43,9 @@
 		AA00004DFF000000000000016B /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000017000000000000001A /* DeviceActivity.framework */; };
 		AA00004DFF000000000000017B /* FamilyControls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000016000000000000001A /* FamilyControls.framework */; };
 		AA00004DFF000000000000018B /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000070000000000000001A /* ManagedSettings.framework */; };
+		AA00003DFF000000000000016B /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000017000000000000001A /* DeviceActivity.framework */; };
+		AA00003DFF000000000000017B /* FamilyControls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000016000000000000001A /* FamilyControls.framework */; };
+		AA00003DFF000000000000018B /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000070000000000000001A /* ManagedSettings.framework */; };
 		AA000050000000000000001B /* SpentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000050000000000000001A /* SpentTests.swift */; };
 		AA000051000000000000001B /* CalculationEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000051000000000000001A /* CalculationEngineTests.swift */; };
 		AA000060000000000000001B /* SpentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000060000000000000001A /* SpentUITests.swift */; };
@@ -172,6 +175,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA00003DFF000000000000016B /* DeviceActivity.framework in Frameworks */,
+				AA00003DFF000000000000017B /* FamilyControls.framework in Frameworks */,
+				AA00003DFF000000000000018B /* ManagedSettings.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
