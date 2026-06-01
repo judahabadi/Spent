@@ -27,25 +27,37 @@ struct TotalActivityReport: DeviceActivityReportScene {
 
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> ReceiptConfiguration {
         var totals: [String: (displayName: String, minutes: Int)] = [:]
+        var scheduleCount = 0, segmentCount = 0, categoryCount = 0, appCount = 0
+
+        func accumulate(bundleID: String, displayName: String, duration: TimeInterval) {
+            let minutes = Int(duration / 60)
+            guard minutes > 0 else { return }
+            if let existing = totals[bundleID] {
+                totals[bundleID] = (existing.displayName, existing.minutes + minutes)
+            } else {
+                totals[bundleID] = (displayName, minutes)
+            }
+        }
 
         for await activityData in data {
+            scheduleCount += 1
             for await segment in activityData.activitySegments {
+                segmentCount += 1
                 for await categoryActivity in segment.categories {
+                    categoryCount += 1
                     for await appActivity in categoryActivity.applications {
+                        appCount += 1
                         let bundleID = appActivity.application.bundleIdentifier ?? "unknown"
-                        let displayName = appActivity.application.localizedDisplayName ?? bundleID
-                        let minutes = Int(appActivity.totalActivityDuration / 60)
-                        guard minutes > 0 else { continue }
-
-                        if let existing = totals[bundleID] {
-                            totals[bundleID] = (existing.displayName, existing.minutes + minutes)
-                        } else {
-                            totals[bundleID] = (displayName, minutes)
-                        }
+                        let name = appActivity.application.localizedDisplayName ?? bundleID
+                        accumulate(bundleID: bundleID, displayName: name, duration: appActivity.totalActivityDuration)
                     }
                 }
             }
         }
+
+        let defaults = UserDefaults(suiteName: "group.app.spent")
+        defaults?.set("schedules=\(scheduleCount) segments=\(segmentCount) categories=\(categoryCount) apps=\(appCount)", forKey: "spent.diagnostics")
+        defaults?.set(Date.now.timeIntervalSince1970, forKey: "spent.diagnostics.ts")
 
         let settings = SpentSettings.load()
         let appUsages = totals.map { bundleID, info in
@@ -71,6 +83,7 @@ struct TotalActivityView: View {
     var body: some View {
         Color.clear
             .onAppear { persist() }
+            .onChange(of: configuration.appUsages.count) { _, _ in persist() }
     }
 
     private func persist() {
@@ -149,7 +162,10 @@ struct SpentSettings: Codable {
     }
 
     enum RatePeriod: String, Codable, CaseIterable {
-        case hourly, daily, weekly, monthly
+        case hourly = "Hourly"
+        case daily = "Daily"
+        case weekly = "Weekly"
+        case monthly = "Monthly"
         var hours: Double {
             switch self { case .hourly: 1; case .daily: 8; case .weekly: 40; case .monthly: 160 }
         }
@@ -159,13 +175,15 @@ struct SpentSettings: Codable {
 // MARK: - CategoryClassifier
 
 // Reads per-app category overrides the user set in the main app (stored in the shared App Group).
-struct CategoryClassifier {
+struct CategoryClassifier: Codable {
+    var overrides: [String: AppCategory] = [:]
+
     static func classify(bundleID: String) -> AppCategory {
         let defaults = UserDefaults(suiteName: "group.app.spent")
-        guard let raw = defaults?.string(forKey: "category.\(bundleID)"),
-              let category = AppCategory(rawValue: raw) else {
+        guard let data = defaults?.data(forKey: "spent.categoryOverrides"),
+              let classifier = try? JSONDecoder().decode(CategoryClassifier.self, from: data) else {
             return .neutral
         }
-        return category
+        return classifier.overrides[bundleID] ?? .neutral
     }
 }

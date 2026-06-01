@@ -1,26 +1,37 @@
 import SwiftUI
+import DeviceActivity
 
 struct ReceiptView: View {
     @Environment(AppViewModel.self) private var appVM
     @State private var showCalendar = false
 
     var body: some View {
-        GeometryReader { geo in
-            if geo.size.width > 700 {
-                // iPad: split layout
-                HStack(spacing: 0) {
+        ZStack {
+            // DeviceActivityReport must have a non-trivial frame and non-zero opacity
+            // so the system allocates resources for the extension process.
+            // No filter: receive all data from all active monitoring schedules.
+            DeviceActivityReport(.init("totalActivity"))
+                .id(appVM.reportRefreshID)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .opacity(0.001)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+
+            GeometryReader { geo in
+                if geo.size.width > 700 {
+                    HStack(spacing: 0) {
+                        receiptPane
+                            .frame(maxWidth: .infinity)
+                        Divider()
+                        statsPanel
+                            .frame(width: 300)
+                    }
+                } else {
                     receiptPane
-                        .frame(maxWidth: .infinity)
-                    Divider()
-                    statsPanel
-                        .frame(width: 300)
                 }
-            } else {
-                // iPhone: full receipt
-                receiptPane
             }
+            .background(Color(.systemBackground))
         }
-        .background(Color(.systemBackground))
         .fullScreenCover(isPresented: Bindable(appVM).isShowingSettings) {
             SettingsView()
         }
@@ -146,7 +157,7 @@ struct ReceiptView: View {
                 .foregroundStyle(.secondary)
                 .frame(width: 60, alignment: .trailing)
 
-            if appVM.storeKit.isDegraded {
+            if appVM.isDegraded {
                 Text("$--.--")
                     .font(.system(size: 11, design: .monospaced))
                     .blur(radius: 3)
@@ -185,8 +196,25 @@ struct ReceiptView: View {
             Divider().padding(.vertical, 6)
             netTotalRow
             streakRow
+            trialBanner
         }
         .padding(.vertical, 12)
+    }
+
+    @ViewBuilder
+    private var trialBanner: some View {
+        if !appVM.storeKit.isSubscribed, let trialStart = appVM.settings.trialStartDate {
+            let daysUsed = Calendar.current.dateComponents([.day], from: trialStart, to: .now).day ?? 0
+            let daysLeft = max(0, 7 - daysUsed)
+            if daysLeft > 0 {
+                Button { appVM.isShowingPaywall = true } label: {
+                    Text("FREE TRIAL — \(daysLeft) DAY\(daysLeft == 1 ? "" : "S") LEFT")
+                        .font(.system(size: 9, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.top, 6)
+            }
+        }
     }
 
     private func totalRow(label: String, value: Double, negative: Bool) -> some View {
@@ -194,7 +222,7 @@ struct ReceiptView: View {
             Text(label)
                 .font(.system(size: 11, design: .monospaced))
             Spacer()
-            if appVM.storeKit.isDegraded {
+            if appVM.isDegraded {
                 Text("$--.--")
                     .font(.system(size: 11, design: .monospaced))
                     .blur(radius: 3)
@@ -216,7 +244,7 @@ struct ReceiptView: View {
             Text(isProfitDay ? "YOU EARNED" : "TOTAL DUE")
                 .font(.system(size: 13, weight: .bold, design: .monospaced))
             Spacer()
-            if appVM.storeKit.isDegraded {
+            if appVM.isDegraded {
                 Button { appVM.isShowingPaywall = true } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "lock.fill").font(.system(size: 10))

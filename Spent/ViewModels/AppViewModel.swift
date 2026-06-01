@@ -18,17 +18,33 @@ final class AppViewModel {
     var isShowingSettings = false
     var isShowingPaywall = false
     var receiptHistory: [DailyReceipt] = []
+    var reportRefreshID = UUID()
 
     // Live update timer
     private var updateTimer: Timer?
+    private var isInitializing = false
 
     func initialize() async {
+        guard !isInitializing else { return }
+        isInitializing = true
+        defer { isInitializing = false }
         await screenTime.requestAuthorization()
         if auth.isSignedIn {
+            if settings.trialStartDate == nil {
+                updateSettings { $0.trialStartDate = Date.now }
+            }
+            screenTime.startMonitoring()
             streak = await cloudKit.fetchStreak()
             await loadTodayReceipt()
             startLiveUpdates()
         }
+    }
+
+    var isDegraded: Bool {
+        if storeKit.isSubscribed || storeKit.isTrialing { return false }
+        guard let trialStart = settings.trialStartDate else { return true }
+        let days = Calendar.current.dateComponents([.day], from: trialStart, to: .now).day ?? 0
+        return days >= 7
     }
 
     func loadTodayReceipt() async {
@@ -43,7 +59,12 @@ final class AppViewModel {
     func startLiveUpdates() {
         updateTimer?.invalidate()
         updateTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
-            Task { await self?.loadTodayReceipt() }
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.reportRefreshID = UUID()
+                try? await Task.sleep(for: .seconds(3))
+                await self.loadTodayReceipt()
+            }
         }
     }
 
@@ -60,15 +81,11 @@ final class AppViewModel {
         await cloudKit.save(streak: streak)
     }
 
-    var settings: SpentSettings {
-        get { SpentSettings.load() }
-        set { newValue.save() }
-    }
+    var settings: SpentSettings = SpentSettings.load()
 
     func updateSettings(_ block: (inout SpentSettings) -> Void) {
-        var s = settings
-        block(&s)
-        s.save()
+        block(&settings)
+        settings.save()
     }
 }
 
@@ -87,6 +104,7 @@ struct SpentSettings: Codable {
     var notificationMinute: Int = 0
     var studentSessionMinutes: Int = 45
     var appLockEnabled: Bool = false
+    var trialStartDate: Date? = nil
 
     var hourlyRate: Double {
         switch userMode {
@@ -95,10 +113,35 @@ struct SpentSettings: Codable {
         }
     }
 
+    var currentGPA: Double {
+        get {
+            if case .student(let gpa, _) = userMode { return gpa }
+            return 3.5
+        }
+        set {
+            if case .student(_, let scale) = userMode {
+                userMode = .student(currentGPA: newValue, scale: scale)
+            }
+        }
+    }
+
+    var gpaScale: GPAScale {
+        get {
+            if case .student(_, let scale) = userMode { return scale }
+            return .deviceDefault
+        }
+        set {
+            if case .student(let gpa, _) = userMode {
+                userMode = .student(currentGPA: gpa, scale: newValue)
+            }
+        }
+    }
+
     private static let key = "spent.settings"
+    private static let suite = UserDefaults(suiteName: "group.app.spent")
 
     static func load() -> SpentSettings {
-        guard let data = UserDefaults.standard.data(forKey: key),
+        guard let data = suite?.data(forKey: key),
               let settings = try? JSONDecoder().decode(SpentSettings.self, from: data) else {
             return SpentSettings()
         }
@@ -107,7 +150,7 @@ struct SpentSettings: Codable {
 
     func save() {
         guard let data = try? JSONEncoder().encode(self) else { return }
-        UserDefaults.standard.set(data, forKey: Self.key)
+        Self.suite?.set(data, forKey: Self.key)
     }
 
     enum RatePeriod: String, Codable, CaseIterable {

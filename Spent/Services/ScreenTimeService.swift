@@ -33,25 +33,33 @@ final class ScreenTimeService {
         authorizationStatus = center.authorizationStatus
     }
 
-    // Start monitoring to populate DeviceActivity data
+    // Start 24 hourly monitoring schedules so each completed hour produces a segment
+    // in DeviceActivityResults. A single daily schedule only creates a segment at 11:59PM,
+    // leaving activitySegments empty for the entire day.
     func startMonitoring() {
-        let schedule = DeviceActivitySchedule(
-            intervalStart: DateComponents(hour: 0, minute: 0),
-            intervalEnd: DateComponents(hour: 23, minute: 59),
-            repeats: true
-        )
-        do {
-            try deviceActivityCenter.startMonitoring(.daily, during: schedule)
-        } catch {
-            // Already monitoring or not authorized — handled gracefully
+        deviceActivityCenter.stopMonitoring([.daily])
+        for hour in 0...23 {
+            let schedule = DeviceActivitySchedule(
+                intervalStart: DateComponents(hour: hour, minute: 0),
+                intervalEnd: DateComponents(hour: hour, minute: 59),
+                repeats: true
+            )
+            try? deviceActivityCenter.startMonitoring(
+                DeviceActivityName.hour(hour),
+                during: schedule
+            )
         }
     }
 
     func stopMonitoring() {
-        deviceActivityCenter.stopMonitoring([.daily])
+        let names = (0...23).map { DeviceActivityName.hour($0) }
+        deviceActivityCenter.stopMonitoring(names)
     }
 }
 
 extension DeviceActivityName {
     static let daily = DeviceActivityName("daily")
+    static func hour(_ h: Int) -> DeviceActivityName {
+        DeviceActivityName("hour-\(String(format: "%02d", h))")
+    }
 }
