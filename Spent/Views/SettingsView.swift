@@ -172,12 +172,24 @@ struct SettingsView: View {
         let diag = defaults?.string(forKey: "spent.diagnostics") ?? "not yet run"
         let ts = defaults?.double(forKey: "spent.diagnostics.ts") ?? 0
         let timeStr = ts > 0 ? Date(timeIntervalSince1970: ts).formatted(.dateTime.hour().minute().second()) : "—"
+        let monDiag = defaults?.string(forKey: "spent.monitoring.diagnostics") ?? "not started"
+        let monTs = defaults?.double(forKey: "spent.monitoring.diagnostics.ts") ?? 0
+        let monTimeStr = monTs > 0 ? Date(timeIntervalSince1970: monTs).formatted(.dateTime.hour().minute().second()) : "—"
         return Section(header: Text("Screen Time Debug")) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(diag)
+                Text("monitoring: \(monDiag)")
                     .font(.system(size: 11, design: .monospaced))
                     .foregroundStyle(.secondary)
-                Text("Last run: \(timeStr)")
+                Text("at: \(monTimeStr)")
+                    .font(.system(size: 10, design: .monospaced))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(.vertical, 4)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("report ext: \(diag)")
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                Text("last run: \(timeStr)")
                     .font(.system(size: 10, design: .monospaced))
                     .foregroundStyle(.tertiary)
             }

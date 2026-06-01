@@ -38,17 +38,27 @@ final class ScreenTimeService {
     // leaving activitySegments empty for the entire day.
     func startMonitoring() {
         deviceActivityCenter.stopMonitoring([.daily])
+        var started = 0
+        var failed = 0
         for hour in 0...23 {
             let schedule = DeviceActivitySchedule(
                 intervalStart: DateComponents(hour: hour, minute: 0),
                 intervalEnd: DateComponents(hour: hour, minute: 59),
                 repeats: true
             )
-            try? deviceActivityCenter.startMonitoring(
-                DeviceActivityName.hour(hour),
-                during: schedule
-            )
+            do {
+                try deviceActivityCenter.startMonitoring(
+                    DeviceActivityName.hour(hour),
+                    during: schedule
+                )
+                started += 1
+            } catch {
+                failed += 1
+            }
         }
+        let defaults = UserDefaults(suiteName: "group.app.spent")
+        defaults?.set("schedules started=\(started) failed=\(failed)", forKey: "spent.monitoring.diagnostics")
+        defaults?.set(Date.now.timeIntervalSince1970, forKey: "spent.monitoring.diagnostics.ts")
     }
 
     func stopMonitoring() {

@@ -7,13 +7,12 @@ struct ReceiptView: View {
 
     var body: some View {
         ZStack {
-            // DeviceActivityReport must have a non-trivial frame and non-zero opacity
-            // so the system allocates resources for the extension process.
-            // No filter: receive all data from all active monitoring schedules.
+            // DeviceActivityReport must be rendered at full opacity; the system checks
+            // visibility before launching the extension process. The extension renders
+            // Color.clear so it is visually transparent — the app UI above covers it.
             DeviceActivityReport(.init("totalActivity"))
                 .id(appVM.reportRefreshID)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .opacity(0.001)
                 .allowsHitTesting(false)
                 .accessibilityHidden(true)
 
