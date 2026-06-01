@@ -16,17 +16,6 @@ struct ReceiptView: View {
 
     var body: some View {
         ZStack {
-            // DeviceActivityReport must be rendered at full opacity; the system checks
-            // visibility before launching the extension process. The extension renders
-            // Color.clear so it is visually transparent — the app UI above covers it.
-            // The filter's daily segment for today is what produces the data segments
-            // delivered to the extension's makeConfiguration.
-            DeviceActivityReport(.init("totalActivity"), filter: todayFilter)
-                .id(appVM.reportRefreshID)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .allowsHitTesting(false)
-                .accessibilityHidden(true)
-
             GeometryReader { geo in
                 if geo.size.width > 700 {
                     HStack(spacing: 0) {
@@ -41,6 +30,15 @@ struct ReceiptView: View {
                 }
             }
             .background(Color(.systemBackground))
+
+            // DeviceActivityReport sits on top so the system's occlusion check sees it
+            // as visible and launches the extension process. The extension renders
+            // Color.clear so it is transparent — the app UI below shows through.
+            DeviceActivityReport(.init("totalActivity"), filter: todayFilter)
+                .id(appVM.reportRefreshID)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
         }
         .fullScreenCover(isPresented: Bindable(appVM).isShowingSettings) {
             SettingsView()
