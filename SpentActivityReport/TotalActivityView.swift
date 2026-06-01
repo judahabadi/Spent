@@ -26,6 +26,12 @@ struct TotalActivityReport: DeviceActivityReportScene {
     }
 
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> ReceiptConfiguration {
+        // Write immediately so diagnostics shows "running…" if the extension launched
+        // but stalls in the loops. If this never appears, the function is never invoked.
+        let defaults = UserDefaults(suiteName: "group.app.spent")
+        defaults?.set("running...", forKey: "spent.diagnostics")
+        defaults?.set(Date.now.timeIntervalSince1970, forKey: "spent.diagnostics.ts")
+
         var totals: [String: (displayName: String, minutes: Int)] = [:]
         var scheduleCount = 0, segmentCount = 0, categoryCount = 0, appCount = 0
 

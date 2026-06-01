@@ -33,33 +33,40 @@ final class ScreenTimeService {
         authorizationStatus = center.authorizationStatus
     }
 
-    // A single full-day schedule keeps Screen Time recording active for this app.
-    // Apple caps monitoring at 20 simultaneous activities, and data segmentation is
-    // driven by the report's DeviceActivityFilter — not by the number of schedules —
-    // so one schedule is sufficient and stays well under the limit.
+    // DeviceActivityReport only calls makeConfiguration after a monitoring interval
+    // COMPLETES. A daily schedule (00:00–23:59) won't complete until 23:59, so the
+    // extension never runs during the day. Hourly schedules complete every hour,
+    // triggering the extension throughout the day. Apple caps at 20 simultaneous
+    // activities, so we monitor hours 0–19 (midnight–8PM). Hours 20–23 are omitted
+    // but the report filter still aggregates the day's data correctly.
     func startMonitoring() {
-        // Clean up the legacy 24-hourly schedules from older builds.
-        let legacyNames = (0...23).map { DeviceActivityName.hour($0) }
-        deviceActivityCenter.stopMonitoring(legacyNames + [.daily])
+        // Stop any previous schedules (daily or hourly).
+        let allNames = (0...23).map { DeviceActivityName.hour($0) } + [.daily]
+        deviceActivityCenter.stopMonitoring(allNames)
 
-        let schedule = DeviceActivitySchedule(
-            intervalStart: DateComponents(hour: 0, minute: 0),
-            intervalEnd: DateComponents(hour: 23, minute: 59),
-            repeats: true
-        )
-        let defaults = UserDefaults(suiteName: "group.app.spent")
-        do {
-            try deviceActivityCenter.startMonitoring(.daily, during: schedule)
-            defaults?.set("schedule started ok (daily)", forKey: "spent.monitoring.diagnostics")
-        } catch {
-            defaults?.set("schedule FAILED: \(error.localizedDescription)", forKey: "spent.monitoring.diagnostics")
+        var started = 0
+        var failed = 0
+        for hour in 0...19 {
+            let schedule = DeviceActivitySchedule(
+                intervalStart: DateComponents(hour: hour, minute: 0),
+                intervalEnd: DateComponents(hour: hour, minute: 59),
+                repeats: true
+            )
+            do {
+                try deviceActivityCenter.startMonitoring(.hour(hour), during: schedule)
+                started += 1
+            } catch {
+                failed += 1
+            }
         }
+        let defaults = UserDefaults(suiteName: "group.app.spent")
+        defaults?.set("schedules started=\(started) failed=\(failed)", forKey: "spent.monitoring.diagnostics")
         defaults?.set(Date.now.timeIntervalSince1970, forKey: "spent.monitoring.diagnostics.ts")
     }
 
     func stopMonitoring() {
-        let names = (0...23).map { DeviceActivityName.hour($0) }
-        deviceActivityCenter.stopMonitoring(names + [.daily])
+        let names = (0...23).map { DeviceActivityName.hour($0) } + [.daily]
+        deviceActivityCenter.stopMonitoring(names)
     }
 }
 
