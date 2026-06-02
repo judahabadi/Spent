@@ -207,18 +207,6 @@ struct SettingsView: View {
                     .foregroundStyle(.tertiary)
             }
             .padding(.vertical, 4)
-            // Visible report. If "EXT OK · N apps · M min" appears here, the
-            // extension launched and read data (independent of the App Group).
-            // If this stays blank, the extension never launches at all.
-            VStack(alignment: .leading, spacing: 4) {
-                Text("live report (should show EXT OK):")
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundStyle(.tertiary)
-                DeviceActivityReport(.init("totalActivity"), filter: todayFilter)
-                    .frame(height: 60)
-                    .border(Color.secondary.opacity(0.3))
-            }
-            .padding(.vertical, 4)
         }
     }
 
