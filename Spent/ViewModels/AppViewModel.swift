@@ -37,6 +37,11 @@ final class AppViewModel {
             streak = await cloudKit.fetchStreak()
             await loadTodayReceipt()
             startLiveUpdates()
+            // Extension needs a few seconds to run on first launch before data is in the App Group
+            Task {
+                try? await Task.sleep(for: .seconds(5))
+                await loadTodayReceipt()
+            }
         }
     }
 
