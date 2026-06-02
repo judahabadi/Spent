@@ -1,10 +1,18 @@
 import SwiftUI
 import LocalAuthentication
+import DeviceActivity
 
 struct SettingsView: View {
     @Environment(AppViewModel.self) private var appVM
     @Environment(\.dismiss) private var dismiss
     @State private var showDeleteConfirm = false
+
+    private var todayFilter: DeviceActivityFilter {
+        let start = Calendar.current.startOfDay(for: .now)
+        return DeviceActivityFilter(
+            segment: .daily(during: DateInterval(start: start, end: .now))
+        )
+    }
 
     var body: some View {
         NavigationStack {
@@ -197,6 +205,18 @@ struct SettingsView: View {
                 Text("last run: \(timeStr)")
                     .font(.system(size: 10, design: .monospaced))
                     .foregroundStyle(.tertiary)
+            }
+            .padding(.vertical, 4)
+            // Visible report. If "EXT OK · N apps · M min" appears here, the
+            // extension launched and read data (independent of the App Group).
+            // If this stays blank, the extension never launches at all.
+            VStack(alignment: .leading, spacing: 4) {
+                Text("live report (should show EXT OK):")
+                    .font(.system(size: 10, design: .monospaced))
+                    .foregroundStyle(.tertiary)
+                DeviceActivityReport(.init("totalActivity"), filter: todayFilter)
+                    .frame(height: 60)
+                    .border(Color.secondary.opacity(0.3))
             }
             .padding(.vertical, 4)
         }
