@@ -1,8 +1,6 @@
 import Foundation
 import DeviceActivity
-import Foundation
 import SwiftUI
-import ManagedSettings
 
 // MARK: - Context identifier
 
