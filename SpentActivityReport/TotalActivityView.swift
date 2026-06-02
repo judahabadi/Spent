@@ -59,6 +59,21 @@ struct TotalActivityReport: DeviceActivityReportScene {
             )
         }
 
+        // Persist here inside makeConfiguration — this is guaranteed to execute.
+        // onAppear on Color.clear is not reliable in extension processes.
+        let receipt = DailyReceipt(
+            id: UUID(),
+            date: Date.now,
+            apps: appUsages,
+            hourlyRate: settings.hourlyRate,
+            mode: settings.userMode
+        )
+        if let encoded = try? JSONEncoder().encode(receipt) {
+            let defaults = UserDefaults(suiteName: "group.app.spent")
+            defaults?.set(encoded, forKey: "today.receipt")
+            defaults?.synchronize()
+        }
+
         return ReceiptConfiguration(appUsages: appUsages, settings: settings)
     }
 }
@@ -70,26 +85,6 @@ struct TotalActivityView: View {
 
     var body: some View {
         Color.clear
-            .onAppear { persist() }
-            .onChange(of: configuration.appUsages.count) { _, _ in persist() }
-    }
-
-    private func persist() {
-        let defaults = UserDefaults(suiteName: "group.app.spent")
-        let settings = configuration.settings
-        let receipt = DailyReceipt(
-            id: UUID(),
-            date: Date.now,
-            apps: configuration.appUsages,
-            hourlyRate: settings.hourlyRate,
-            mode: settings.userMode
-        )
-        if let data = try? JSONEncoder().encode(receipt) {
-            defaults?.set(data, forKey: "today.receipt")
-            // Extension processes are killed aggressively; synchronize() ensures
-            // the write reaches the shared container before termination.
-            defaults?.synchronize()
-        }
     }
 }
 
