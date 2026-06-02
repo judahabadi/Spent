@@ -175,6 +175,8 @@ struct SettingsView: View {
         let monDiag = defaults?.string(forKey: "spent.monitoring.diagnostics") ?? "not started"
         let monTs = defaults?.double(forKey: "spent.monitoring.diagnostics.ts") ?? 0
         let monTimeStr = monTs > 0 ? Date(timeIntervalSince1970: monTs).formatted(.dateTime.hour().minute().second()) : "—"
+        let launchTs = defaults?.double(forKey: "spent.extension.launch.ts") ?? 0
+        let launchStr = launchTs > 0 ? Date(timeIntervalSince1970: launchTs).formatted(.dateTime.hour().minute().second()) : "never"
         return Section(header: Text("Screen Time Debug")) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("monitoring: \(monDiag)")
@@ -186,7 +188,10 @@ struct SettingsView: View {
             }
             .padding(.vertical, 4)
             VStack(alignment: .leading, spacing: 4) {
-                Text("report ext: \(diag)")
+                Text("ext process launch: \(launchStr)")
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                Text("makeConfig: \(diag)")
                     .font(.system(size: 11, design: .monospaced))
                     .foregroundStyle(.secondary)
                 Text("last run: \(timeStr)")
