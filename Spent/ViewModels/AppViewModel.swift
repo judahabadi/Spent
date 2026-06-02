@@ -183,6 +183,8 @@ struct SharedDataStore {
     private static let receiptKey = "today.receipt"
 
     static func loadTodayReceipt() -> DailyReceipt? {
+        // Force a read from the shared container in case the in-process cache is stale.
+        suite?.synchronize()
         guard let data = suite?.data(forKey: receiptKey) else { return nil }
         return try? JSONDecoder().decode(DailyReceipt.self, from: data)
     }

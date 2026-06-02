@@ -86,6 +86,9 @@ struct TotalActivityView: View {
         )
         if let data = try? JSONEncoder().encode(receipt) {
             defaults?.set(data, forKey: "today.receipt")
+            // Extension processes are killed aggressively; synchronize() ensures
+            // the write reaches the shared container before termination.
+            defaults?.synchronize()
         }
     }
 }
