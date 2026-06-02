@@ -14,6 +14,7 @@ struct SettingsView: View {
                 securitySection
                 accountSection
                 subscriptionSection
+                dataSection
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -162,6 +163,28 @@ struct SettingsView: View {
                 showDeleteConfirm = true
             } label: {
                 Text("Delete Account")
+            }
+        }
+    }
+
+    private var dataSection: some View {
+        let receipt = appVM.todayReceipt
+        let appCount = receipt.apps.count
+        let lastUpdate = appCount > 0
+            ? receipt.date.formatted(.dateTime.hour().minute().second())
+            : "not yet received"
+        return Section("Screen Time Data") {
+            HStack {
+                Text("Last received")
+                Spacer()
+                Text(lastUpdate)
+                    .foregroundStyle(.secondary)
+            }
+            HStack {
+                Text("Apps today")
+                Spacer()
+                Text(appCount > 0 ? "\(appCount)" : "—")
+                    .foregroundStyle(.secondary)
             }
         }
     }

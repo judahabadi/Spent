@@ -41,13 +41,16 @@ struct ReceiptView: View {
         ScrollView {
             VStack(spacing: 0) {
                 headerBar
-                // Zero-height invisible trigger — DeviceActivityReport must stay in the
-                // view hierarchy or the extension never launches and makeConfiguration
-                // is never called. The extension renders Color.clear so nothing shows.
-                DeviceActivityReport(.init("totalActivity"), filter: todayFilter)
-                    .frame(height: 1)
-                    .opacity(0)
-                    .id(appVM.reportRefreshID)
+                    .overlay(alignment: .bottom) {
+                        // DeviceActivityReport must be in the view hierarchy for the extension
+                        // to run. 40pt frame is the minimum known to reliably trigger
+                        // makeConfiguration; smaller frames may be optimised away by iOS.
+                        // opacity(0) makes it invisible with no layout impact.
+                        DeviceActivityReport(.init("totalActivity"), filter: todayFilter)
+                            .frame(height: 40)
+                            .opacity(0)
+                            .id(appVM.reportRefreshID)
+                    }
                 periodToggle
                 receiptCard
                     .padding(.horizontal, 20)
