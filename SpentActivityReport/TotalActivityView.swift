@@ -24,6 +24,14 @@ struct TotalActivityReport: DeviceActivityReportScene {
     }
 
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> ReceiptConfiguration {
+        let defaults = UserDefaults(suiteName: "group.app.spent")
+
+        // Write immediately so we know makeConfiguration was entered, even if it crashes later
+        let callCount = (defaults?.integer(forKey: "spent.makeconfig.count") ?? 0) + 1
+        defaults?.set(callCount, forKey: "spent.makeconfig.count")
+        defaults?.set(Date.now.timeIntervalSince1970, forKey: "spent.makeconfig.ts")
+        defaults?.synchronize()
+
         var totals: [String: (displayName: String, minutes: Int)] = [:]
 
         func accumulate(bundleID: String, displayName: String, duration: TimeInterval) {
@@ -47,6 +55,10 @@ struct TotalActivityReport: DeviceActivityReportScene {
                 }
             }
         }
+
+        // Write app count so we know if ActivityResults had data
+        defaults?.set(totals.count, forKey: "spent.makeconfig.appcount")
+        defaults?.synchronize()
 
         let settings = SpentSettings.load()
         let appUsages = totals.map { bundleID, info in

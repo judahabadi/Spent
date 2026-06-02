@@ -168,23 +168,35 @@ struct SettingsView: View {
     }
 
     private var dataSection: some View {
+        let defaults = UserDefaults(suiteName: "group.app.spent")
+        let callCount = defaults?.integer(forKey: "spent.makeconfig.count") ?? 0
+        let ts = defaults?.double(forKey: "spent.makeconfig.ts") ?? 0
+        let lastCall = ts > 0 ? Date(timeIntervalSince1970: ts).formatted(.dateTime.hour().minute().second()) : "never"
+        let foundApps = defaults?.integer(forKey: "spent.makeconfig.appcount") ?? 0
         let receipt = appVM.todayReceipt
-        let appCount = receipt.apps.count
-        let lastUpdate = appCount > 0
-            ? receipt.date.formatted(.dateTime.hour().minute().second())
-            : "not yet received"
-        return Section("Screen Time Data") {
+        let decoded = receipt.apps.count
+
+        return Section("Screen Time Debug") {
             HStack {
-                Text("Last received")
+                Text("makeConfig called")
                 Spacer()
-                Text(lastUpdate)
-                    .foregroundStyle(.secondary)
+                Text(callCount > 0 ? "\(callCount)x — \(lastCall)" : "never")
+                    .font(.system(size: 12, design: .monospaced))
+                    .foregroundStyle(callCount > 0 ? .primary : .red)
             }
             HStack {
-                Text("Apps today")
+                Text("Apps from system")
                 Spacer()
-                Text(appCount > 0 ? "\(appCount)" : "—")
-                    .foregroundStyle(.secondary)
+                Text("\(foundApps)")
+                    .font(.system(size: 12, design: .monospaced))
+                    .foregroundStyle(foundApps > 0 ? .primary : .secondary)
+            }
+            HStack {
+                Text("Apps decoded in app")
+                Spacer()
+                Text("\(decoded)")
+                    .font(.system(size: 12, design: .monospaced))
+                    .foregroundStyle(decoded > 0 ? .green : .secondary)
             }
         }
     }
