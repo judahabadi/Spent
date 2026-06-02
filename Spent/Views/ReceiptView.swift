@@ -1,8 +1,16 @@
 import SwiftUI
+import DeviceActivity
 
 struct ReceiptView: View {
     @Environment(AppViewModel.self) private var appVM
     @State private var showCalendar = false
+
+    private var todayFilter: DeviceActivityFilter {
+        let start = Calendar.current.startOfDay(for: .now)
+        return DeviceActivityFilter(
+            segment: .daily(during: DateInterval(start: start, end: .now))
+        )
+    }
 
     var body: some View {
         ZStack {
@@ -33,6 +41,11 @@ struct ReceiptView: View {
         ScrollView {
             VStack(spacing: 0) {
                 headerBar
+                // Triggers makeConfiguration in the extension. Must be a direct VStack
+                // child to reliably fire. Extension renders Color.clear — nothing visible.
+                DeviceActivityReport(.init("totalActivity"), filter: todayFilter)
+                    .frame(height: 40)
+                    .id(appVM.reportRefreshID)
                 periodToggle
                 receiptCard
                     .padding(.horizontal, 20)
