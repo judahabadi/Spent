@@ -79,14 +79,26 @@ struct TotalActivityReport: DeviceActivityReportScene {
 
 // MARK: - View
 
-// Rendered off-screen by the system to extract and persist receipt data to the shared App Group.
+// Renders the extension's output. Made visible so the host app can confirm the
+// extension actually launched (independent of the App Group write-back channel).
 struct TotalActivityView: View {
     let configuration: TotalActivityReport.ReceiptConfiguration
 
+    private var totalMinutes: Int {
+        configuration.appUsages.reduce(0) { $0 + $1.minutes }
+    }
+
     var body: some View {
-        Color.clear
-            .onAppear { persist() }
-            .onChange(of: configuration.appUsages.count) { _, _ in persist() }
+        VStack(spacing: 2) {
+            Text("EXT OK")
+                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                .foregroundColor(.green)
+            Text("\(configuration.appUsages.count) apps · \(totalMinutes) min")
+                .font(.system(size: 10, design: .monospaced))
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear { persist() }
+        .onChange(of: configuration.appUsages.count) { _, _ in persist() }
     }
 
     private func persist() {

@@ -5,15 +5,6 @@ struct ReceiptView: View {
     @Environment(AppViewModel.self) private var appVM
     @State private var showCalendar = false
 
-    // Daily segment from midnight to now — drives the data delivered to the
-    // report extension's makeConfiguration.
-    private var todayFilter: DeviceActivityFilter {
-        let start = Calendar.current.startOfDay(for: .now)
-        return DeviceActivityFilter(
-            segment: .daily(during: DateInterval(start: start, end: .now))
-        )
-    }
-
     var body: some View {
         ZStack {
             GeometryReader { geo in
@@ -30,15 +21,6 @@ struct ReceiptView: View {
                 }
             }
             .background(Color(.systemBackground))
-
-            // DeviceActivityReport sits on top so the system's occlusion check sees it
-            // as visible and launches the extension process. The extension renders
-            // Color.clear so it is transparent — the app UI below shows through.
-            DeviceActivityReport(.init("totalActivity"), filter: todayFilter)
-                .id(appVM.reportRefreshID)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .allowsHitTesting(false)
-                .accessibilityHidden(true)
         }
         .fullScreenCover(isPresented: Bindable(appVM).isShowingSettings) {
             SettingsView()
