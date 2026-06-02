@@ -379,7 +379,7 @@
 		AA00001D0000000000000050 /* Embed ExtensionKit Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "";
+			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
 			dstSubfolderSpec = 16;
 			files = (
 				AA00003D000000000000001D /* SpentActivityReport.appex in Embed ExtensionKit Extensions */,
