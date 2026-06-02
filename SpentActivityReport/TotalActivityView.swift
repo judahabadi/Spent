@@ -24,25 +24,26 @@ struct TotalActivityReport: DeviceActivityReportScene {
     }
 
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> ReceiptConfiguration {
-        var totals: [String: (displayName: String, minutes: Int)] = [:]
+        var totals: [String: (displayName: String, minutes: Int, appleCategory: String?)] = [:]
 
-        func accumulate(bundleID: String, displayName: String, duration: TimeInterval) {
+        func accumulate(bundleID: String, displayName: String, duration: TimeInterval, appleCategory: String?) {
             let minutes = Int(duration / 60)
             guard minutes > 0 else { return }
             if let existing = totals[bundleID] {
-                totals[bundleID] = (existing.displayName, existing.minutes + minutes)
+                totals[bundleID] = (existing.displayName, existing.minutes + minutes, existing.appleCategory ?? appleCategory)
             } else {
-                totals[bundleID] = (displayName, minutes)
+                totals[bundleID] = (displayName, minutes, appleCategory)
             }
         }
 
         for await activityData in data {
             for await segment in activityData.activitySegments {
                 for await categoryActivity in segment.categories {
+                    let appleCategory = categoryActivity.category.localizedDisplayName
                     for await appActivity in categoryActivity.applications {
                         let bundleID = appActivity.application.bundleIdentifier ?? "unknown"
                         let name = appActivity.application.localizedDisplayName ?? bundleID
-                        accumulate(bundleID: bundleID, displayName: name, duration: appActivity.totalActivityDuration)
+                        accumulate(bundleID: bundleID, displayName: name, duration: appActivity.totalActivityDuration, appleCategory: appleCategory)
                     }
                 }
             }
@@ -55,7 +56,7 @@ struct TotalActivityReport: DeviceActivityReportScene {
                 bundleID: bundleID,
                 displayName: info.displayName,
                 minutes: info.minutes,
-                category: CategoryClassifier.classify(bundleID: bundleID)
+                category: CategoryClassifier.classify(bundleID: bundleID, appleCategory: info.appleCategory)
             )
         }
 
@@ -162,16 +163,34 @@ struct SpentSettings: Codable {
 
 // MARK: - CategoryClassifier
 
-// Reads per-app category overrides the user set in the main app (stored in the shared App Group).
 struct CategoryClassifier: Codable {
     var overrides: [String: AppCategory] = [:]
 
-    static func classify(bundleID: String) -> AppCategory {
+    static func classify(bundleID: String, appleCategory: String?) -> AppCategory {
         let defaults = UserDefaults(suiteName: "group.app.spent")
-        guard let data = defaults?.data(forKey: "spent.categoryOverrides"),
-              let classifier = try? JSONDecoder().decode(CategoryClassifier.self, from: data) else {
-            return .neutral
+        if let data = defaults?.data(forKey: "spent.categoryOverrides"),
+           let classifier = try? JSONDecoder().decode(CategoryClassifier.self, from: data),
+           let override = classifier.overrides[bundleID] {
+            return override
         }
-        return classifier.overrides[bundleID] ?? .neutral
+        return defaultCategory(for: appleCategory)
     }
+
+    static func defaultCategory(for appleCategory: String?) -> AppCategory {
+        guard let cat = appleCategory?.lowercased() else { return .neutral }
+        if spentCategories.contains(where: { cat.contains($0) }) { return .spent }
+        if investedCategories.contains(where: { cat.contains($0) }) { return .invested }
+        return .neutral
+    }
+
+    private static let spentCategories = [
+        "social", "entertainment", "game", "photo", "video",
+        "shopping", "food", "sports", "news", "magazine"
+    ]
+
+    private static let investedCategories = [
+        "productivity", "education", "reference", "book",
+        "business", "finance", "health", "fitness",
+        "developer", "medical", "navigation", "utilities"
+    ]
 }
