@@ -59,8 +59,49 @@ struct TotalActivityReport: DeviceActivityReportScene {
             )
         }
 
+        // Write to App Group container inside makeConfiguration — the only guaranteed execution
+        // point in an extension process. onAppear/onChange on extension views is unreliable.
+        if let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.app.spent"
+        ) {
+            // Simple format: pure primitives only, no associated-value enums.
+            // This is the primary path the main app reads from.
+            let simpleApps = appUsages.map {
+                SimpleApp(b: $0.bundleID, n: $0.displayName, m: $0.minutes, c: $0.category.rawValue)
+            }
+            if let simpleData = try? JSONEncoder().encode(simpleApps) {
+                try? simpleData.write(
+                    to: containerURL.appendingPathComponent("apps-simple.json"),
+                    options: .atomicWrite
+                )
+            }
+
+            // Full receipt JSON as secondary path.
+            let receipt = DailyReceipt(
+                id: UUID(),
+                date: Date.now,
+                apps: appUsages,
+                hourlyRate: settings.hourlyRate,
+                mode: settings.userMode
+            )
+            if let receiptData = try? JSONEncoder().encode(receipt) {
+                try? receiptData.write(
+                    to: containerURL.appendingPathComponent("today.receipt"),
+                    options: .atomicWrite
+                )
+            }
+        }
+
         return ReceiptConfiguration(appUsages: appUsages, settings: settings)
     }
+}
+
+// Simple codable used only for cross-process file transfer. Short keys reduce file size.
+private struct SimpleApp: Codable {
+    var b: String // bundleID
+    var n: String // displayName
+    var m: Int    // minutes
+    var c: String // category rawValue
 }
 
 // MARK: - View
@@ -70,23 +111,6 @@ struct TotalActivityView: View {
 
     var body: some View {
         Color.clear
-            .onAppear { persist() }
-            .onChange(of: configuration.appUsages.count) { _, _ in persist() }
-    }
-
-    private func persist() {
-        let defaults = UserDefaults(suiteName: "group.app.spent")
-        let settings = configuration.settings
-        let receipt = DailyReceipt(
-            id: UUID(),
-            date: Date.now,
-            apps: configuration.appUsages,
-            hourlyRate: settings.hourlyRate,
-            mode: settings.userMode
-        )
-        if let data = try? JSONEncoder().encode(receipt) {
-            defaults?.set(data, forKey: "today.receipt")
-        }
     }
 }
 
@@ -162,7 +186,6 @@ struct SpentSettings: Codable {
 
 // MARK: - CategoryClassifier
 
-// Reads per-app category overrides the user set in the main app (stored in the shared App Group).
 struct CategoryClassifier: Codable {
     var overrides: [String: AppCategory] = [:]
 

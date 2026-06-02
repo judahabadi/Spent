@@ -14,6 +14,7 @@ struct SettingsView: View {
                 securitySection
                 accountSection
                 subscriptionSection
+                dataSection
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -191,6 +192,27 @@ struct SettingsView: View {
                     Text("Unlock Full Receipt — $1/mo")
                         .foregroundStyle(.primary)
                 }
+            }
+        }
+    }
+
+    private var dataSection: some View {
+        let appCount = appVM.todayReceipt.apps.count
+        return Section("Screen Time Data") {
+            HStack {
+                Text("Apps today")
+                Spacer()
+                Text(appCount > 0 ? "\(appCount)" : "—")
+                    .foregroundStyle(.secondary)
+            }
+            HStack {
+                Text("Status")
+                Spacer()
+                Text(appVM.receiptLoadStatus)
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(appVM.receiptLoadStatus.hasPrefix("ok") || appVM.receiptLoadStatus.hasPrefix("full-ok") ? .green : .orange)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.trailing)
             }
         }
     }

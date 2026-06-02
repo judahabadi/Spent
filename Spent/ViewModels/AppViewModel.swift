@@ -47,11 +47,12 @@ final class AppViewModel {
         return days >= 7
     }
 
+    var receiptLoadStatus: String = "not loaded"
+
     func loadTodayReceipt() async {
-        // In production: read from DeviceActivity report extension shared container
-        // Here: build from cached shared UserDefaults suite
         let cached = SharedDataStore.loadTodayReceipt()
         await MainActor.run {
+            self.receiptLoadStatus = SharedDataStore.lastLoadStatus
             self.todayReceipt = cached ?? .empty(date: .now, hourlyRate: settings.hourlyRate, mode: settings.userMode)
         }
     }
@@ -175,15 +176,66 @@ struct SpentSettings: Codable {
 // Shared data store for app group communication with extensions
 struct SharedDataStore {
     private static let suite = UserDefaults(suiteName: "group.app.spent")
-    private static let receiptKey = "today.receipt"
+    private static let groupID = "group.app.spent"
+
+    // Last diagnostic from loadTodayReceipt — shown in Settings for debugging.
+    static var lastLoadStatus: String = "not loaded"
 
     static func loadTodayReceipt() -> DailyReceipt? {
-        guard let data = suite?.data(forKey: receiptKey) else { return nil }
-        return try? JSONDecoder().decode(DailyReceipt.self, from: data)
-    }
+        let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: groupID
+        )
 
-    static func saveTodayReceipt(_ receipt: DailyReceipt) {
-        guard let data = try? JSONEncoder().encode(receipt) else { return }
-        suite?.set(data, forKey: receiptKey)
+        // Primary: simple flat format written by the extension in makeConfiguration.
+        // Uses only String/Int — no associated-value enum Codable issues possible.
+        if let containerURL {
+            let simpleURL = containerURL.appendingPathComponent("apps-simple.json")
+            if let data = try? Data(contentsOf: simpleURL) {
+                struct SimpleApp: Codable { var b: String; var n: String; var m: Int; var c: String }
+                if let simpleApps = try? JSONDecoder().decode([SimpleApp].self, from: data),
+                   !simpleApps.isEmpty {
+                    let settings = SpentSettings.load()
+                    let apps = simpleApps.map { app in
+                        AppUsage(
+                            id: UUID(),
+                            bundleID: app.b,
+                            displayName: app.n,
+                            minutes: app.m,
+                            category: AppCategory(rawValue: app.c) ?? .neutral
+                        )
+                    }
+                    lastLoadStatus = "ok:\(apps.count)apps"
+                    return DailyReceipt(
+                        id: UUID(),
+                        date: .now,
+                        apps: apps,
+                        hourlyRate: settings.hourlyRate,
+                        mode: settings.userMode
+                    )
+                } else {
+                    lastLoadStatus = "simple-parse-fail(\(data.count)b)"
+                }
+            } else {
+                lastLoadStatus = "no-file"
+            }
+        } else {
+            lastLoadStatus = "container-nil"
+        }
+
+        // Secondary: full receipt JSON.
+        if let containerURL {
+            let fileURL = containerURL.appendingPathComponent("today.receipt")
+            if let data = try? Data(contentsOf: fileURL) {
+                do {
+                    let receipt = try JSONDecoder().decode(DailyReceipt.self, from: data)
+                    lastLoadStatus = "full-ok:\(receipt.apps.count)apps"
+                    return receipt
+                } catch {
+                    lastLoadStatus = "full-err:\(error)"
+                }
+            }
+        }
+
+        return nil
     }
 }
