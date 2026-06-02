@@ -59,7 +59,6 @@ struct TotalActivityReport: DeviceActivityReportScene {
             }
         }
 
-        let defaults = UserDefaults(suiteName: "group.app.spent")
         defaults?.set("schedules=\(scheduleCount) segments=\(segmentCount) categories=\(categoryCount) apps=\(appCount)", forKey: "spent.diagnostics")
         defaults?.set(Date.now.timeIntervalSince1970, forKey: "spent.diagnostics.ts")
 
