@@ -190,11 +190,63 @@ struct CategoryClassifier: Codable {
     var overrides: [String: AppCategory] = [:]
 
     static func classify(bundleID: String) -> AppCategory {
+        // User overrides take priority.
         let defaults = UserDefaults(suiteName: "group.app.spent")
-        guard let data = defaults?.data(forKey: "spent.categoryOverrides"),
-              let classifier = try? JSONDecoder().decode(CategoryClassifier.self, from: data) else {
-            return .neutral
+        if let data = defaults?.data(forKey: "spent.categoryOverrides"),
+           let classifier = try? JSONDecoder().decode(CategoryClassifier.self, from: data),
+           let override = classifier.overrides[bundleID] {
+            return override
         }
-        return classifier.overrides[bundleID] ?? .neutral
+        return heuristic(bundleID: bundleID)
+    }
+
+    // Pattern-based classification for common apps.
+    // Social/entertainment → Spent; productivity/education/health → Invested.
+    private static func heuristic(bundleID: String) -> AppCategory {
+        let id = bundleID.lowercased()
+
+        let spentKeywords: [String] = [
+            // Social
+            "facebook", "instagram", "twitter", "snapchat", "tiktok", "bytedance",
+            "reddit", "tumblr", "pinterest", "linkedin", "bereal", "discord",
+            "telegram", "whatsapp", "messenger", "signal", "wechat",
+            // Entertainment
+            "netflix", "youtube", "hulu", "disneyplus", "disney.plus", "hbomax",
+            "twitch", "peacocktv", "paramountplus", "appletv",
+            "spotify", "applemusic", "soundcloud", "pandora", "deezer",
+            "tinder", "bumble", "hinge", "match",
+            // Browsers (general surfing)
+            "mobilesafari", "chrome", "firefox", "brave", "opera", "duckduckgo",
+            // Games (common patterns)
+            ".game.", "games.", "gaming", "clash", "candy", "angry", "subway",
+            "roblox", "minecraft", "fortnite", "among", "wordle", "nytimes.games",
+        ]
+
+        let investedKeywords: [String] = [
+            // Productivity
+            "notion", "evernote", "bear", "obsidian", "day-one", "dayone",
+            "todoist", "things3", "things.", "omnifocus", "ticktick", "habitica",
+            "mobilenotes", "reminders",
+            "pages", "numbers", "keynote",
+            "word", "excel", "powerpoint", "onenote", "office",
+            "photoshop", "lightroom", "procreate", "figma", "sketch", "canva",
+            // Communication (work)
+            "slack", "msteams", "zoom", "webex", "meet", "googlemeet",
+            // Education
+            "duolingo", "khanacademy", "coursera", "udemy", "edx",
+            "quizlet", "anki", "brainscape",
+            "kindle", "books", "audible", "libby",
+            // Health & fitness
+            "health", "fitness", "workout", "gymkit", "strava", "runkeeper",
+            "myfitnesspal", "headspace", "calm", "waking", "sleep",
+            // Dev / creative tools
+            "xcode", "vscode", "github", "jira", "linear", "asana",
+            // Finance
+            "mint", "ynab", "personalcapital",
+        ]
+
+        for kw in spentKeywords where id.contains(kw) { return .spent }
+        for kw in investedKeywords where id.contains(kw) { return .invested }
+        return .neutral
     }
 }
