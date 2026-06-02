@@ -24,14 +24,7 @@ struct TotalActivityReport: DeviceActivityReportScene {
     }
 
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> ReceiptConfiguration {
-        // Write immediately so diagnostics shows "running…" if the extension launched
-        // but stalls in the loops. If this never appears, the function is never invoked.
-        let defaults = UserDefaults(suiteName: "group.app.spent")
-        defaults?.set("running...", forKey: "spent.diagnostics")
-        defaults?.set(Date.now.timeIntervalSince1970, forKey: "spent.diagnostics.ts")
-
         var totals: [String: (displayName: String, minutes: Int)] = [:]
-        var scheduleCount = 0, segmentCount = 0, categoryCount = 0, appCount = 0
 
         func accumulate(bundleID: String, displayName: String, duration: TimeInterval) {
             let minutes = Int(duration / 60)
@@ -44,13 +37,9 @@ struct TotalActivityReport: DeviceActivityReportScene {
         }
 
         for await activityData in data {
-            scheduleCount += 1
             for await segment in activityData.activitySegments {
-                segmentCount += 1
                 for await categoryActivity in segment.categories {
-                    categoryCount += 1
                     for await appActivity in categoryActivity.applications {
-                        appCount += 1
                         let bundleID = appActivity.application.bundleIdentifier ?? "unknown"
                         let name = appActivity.application.localizedDisplayName ?? bundleID
                         accumulate(bundleID: bundleID, displayName: name, duration: appActivity.totalActivityDuration)
@@ -58,9 +47,6 @@ struct TotalActivityReport: DeviceActivityReportScene {
                 }
             }
         }
-
-        defaults?.set("schedules=\(scheduleCount) segments=\(segmentCount) categories=\(categoryCount) apps=\(appCount)", forKey: "spent.diagnostics")
-        defaults?.set(Date.now.timeIntervalSince1970, forKey: "spent.diagnostics.ts")
 
         let settings = SpentSettings.load()
         let appUsages = totals.map { bundleID, info in
@@ -79,26 +65,13 @@ struct TotalActivityReport: DeviceActivityReportScene {
 
 // MARK: - View
 
-// Renders the extension's output. Made visible so the host app can confirm the
-// extension actually launched (independent of the App Group write-back channel).
 struct TotalActivityView: View {
     let configuration: TotalActivityReport.ReceiptConfiguration
 
-    private var totalMinutes: Int {
-        configuration.appUsages.reduce(0) { $0 + $1.minutes }
-    }
-
     var body: some View {
-        VStack(spacing: 2) {
-            Text("EXT OK")
-                .font(.system(size: 11, weight: .bold, design: .monospaced))
-                .foregroundColor(.green)
-            Text("\(configuration.appUsages.count) apps · \(totalMinutes) min")
-                .font(.system(size: 10, design: .monospaced))
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onAppear { persist() }
-        .onChange(of: configuration.appUsages.count) { _, _ in persist() }
+        Color.clear
+            .onAppear { persist() }
+            .onChange(of: configuration.appUsages.count) { _, _ in persist() }
     }
 
     private func persist() {

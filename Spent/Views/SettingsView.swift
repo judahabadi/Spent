@@ -1,18 +1,10 @@
 import SwiftUI
 import LocalAuthentication
-import DeviceActivity
 
 struct SettingsView: View {
     @Environment(AppViewModel.self) private var appVM
     @Environment(\.dismiss) private var dismiss
     @State private var showDeleteConfirm = false
-
-    private var todayFilter: DeviceActivityFilter {
-        let start = Calendar.current.startOfDay(for: .now)
-        return DeviceActivityFilter(
-            segment: .daily(during: DateInterval(start: start, end: .now))
-        )
-    }
 
     var body: some View {
         NavigationStack {
@@ -22,7 +14,6 @@ struct SettingsView: View {
                 securitySection
                 accountSection
                 subscriptionSection
-                diagnosticsSection
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -172,41 +163,6 @@ struct SettingsView: View {
             } label: {
                 Text("Delete Account")
             }
-        }
-    }
-
-    private var diagnosticsSection: some View {
-        let defaults = UserDefaults(suiteName: "group.app.spent")
-        let diag = defaults?.string(forKey: "spent.diagnostics") ?? "not yet run"
-        let ts = defaults?.double(forKey: "spent.diagnostics.ts") ?? 0
-        let timeStr = ts > 0 ? Date(timeIntervalSince1970: ts).formatted(.dateTime.hour().minute().second()) : "—"
-        let monDiag = defaults?.string(forKey: "spent.monitoring.diagnostics") ?? "not started"
-        let monTs = defaults?.double(forKey: "spent.monitoring.diagnostics.ts") ?? 0
-        let monTimeStr = monTs > 0 ? Date(timeIntervalSince1970: monTs).formatted(.dateTime.hour().minute().second()) : "—"
-        let launchTs = defaults?.double(forKey: "spent.extension.launch.ts") ?? 0
-        let launchStr = launchTs > 0 ? Date(timeIntervalSince1970: launchTs).formatted(.dateTime.hour().minute().second()) : "never"
-        return Section(header: Text("Screen Time Debug")) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("monitoring: \(monDiag)")
-                    .font(.system(size: 11, design: .monospaced))
-                    .foregroundStyle(.secondary)
-                Text("at: \(monTimeStr)")
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(.vertical, 4)
-            VStack(alignment: .leading, spacing: 4) {
-                Text("ext process launch: \(launchStr)")
-                    .font(.system(size: 11, design: .monospaced))
-                    .foregroundStyle(.secondary)
-                Text("makeConfig: \(diag)")
-                    .font(.system(size: 11, design: .monospaced))
-                    .foregroundStyle(.secondary)
-                Text("last run: \(timeStr)")
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(.vertical, 4)
         }
     }
 
