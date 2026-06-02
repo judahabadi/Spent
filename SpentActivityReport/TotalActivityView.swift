@@ -59,8 +59,6 @@ struct TotalActivityReport: DeviceActivityReportScene {
             )
         }
 
-        // Persist here inside makeConfiguration — this is guaranteed to execute.
-        // onAppear on Color.clear is not reliable in extension processes.
         let receipt = DailyReceipt(
             id: UUID(),
             date: Date.now,
@@ -69,6 +67,15 @@ struct TotalActivityReport: DeviceActivityReportScene {
             mode: settings.userMode
         )
         if let encoded = try? JSONEncoder().encode(receipt) {
+            // Primary: write to a file in the App Group container.
+            // This is more reliable than UserDefaults across processes.
+            if let containerURL = FileManager.default.containerURL(
+                forSecurityApplicationGroupIdentifier: "group.app.spent"
+            ) {
+                let fileURL = containerURL.appendingPathComponent("today.receipt")
+                try? encoded.write(to: fileURL, options: .atomicWrite)
+            }
+            // Fallback: also write via UserDefaults in case file write fails.
             let defaults = UserDefaults(suiteName: "group.app.spent")
             defaults?.set(encoded, forKey: "today.receipt")
             defaults?.synchronize()
@@ -83,8 +90,18 @@ struct TotalActivityReport: DeviceActivityReportScene {
 struct TotalActivityView: View {
     let configuration: TotalActivityReport.ReceiptConfiguration
 
+    private var containerStatus: String {
+        let url = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.app.spent"
+        )
+        return url != nil ? "AG:OK" : "AG:NIL"
+    }
+
     var body: some View {
-        Color.clear
+        Text("\(containerStatus) \(configuration.appUsages.count)apps")
+            .font(.system(size: 10, weight: .bold, design: .monospaced))
+            .foregroundColor(containerStatus == "AG:OK" ? .green : .red)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

@@ -183,7 +183,17 @@ struct SharedDataStore {
     private static let receiptKey = "today.receipt"
 
     static func loadTodayReceipt() -> DailyReceipt? {
-        // Force a read from the shared container in case the in-process cache is stale.
+        // Primary: read from the file the extension writes directly.
+        if let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.app.spent"
+        ) {
+            let fileURL = containerURL.appendingPathComponent("today.receipt")
+            if let data = try? Data(contentsOf: fileURL),
+               let receipt = try? JSONDecoder().decode(DailyReceipt.self, from: data) {
+                return receipt
+            }
+        }
+        // Fallback: try UserDefaults App Group.
         suite?.synchronize()
         guard let data = suite?.data(forKey: receiptKey) else { return nil }
         return try? JSONDecoder().decode(DailyReceipt.self, from: data)
