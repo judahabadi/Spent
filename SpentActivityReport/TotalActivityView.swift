@@ -24,26 +24,25 @@ struct TotalActivityReport: DeviceActivityReportScene {
     }
 
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> ReceiptConfiguration {
-        var totals: [String: (displayName: String, minutes: Int, appleCategory: String?)] = [:]
+        var totals: [String: (displayName: String, minutes: Int)] = [:]
 
-        func accumulate(bundleID: String, displayName: String, duration: TimeInterval, appleCategory: String?) {
+        func accumulate(bundleID: String, displayName: String, duration: TimeInterval) {
             let minutes = Int(duration / 60)
             guard minutes > 0 else { return }
             if let existing = totals[bundleID] {
-                totals[bundleID] = (existing.displayName, existing.minutes + minutes, existing.appleCategory ?? appleCategory)
+                totals[bundleID] = (existing.displayName, existing.minutes + minutes)
             } else {
-                totals[bundleID] = (displayName, minutes, appleCategory)
+                totals[bundleID] = (displayName, minutes)
             }
         }
 
         for await activityData in data {
             for await segment in activityData.activitySegments {
                 for await categoryActivity in segment.categories {
-                    let appleCategory = categoryActivity.category.localizedDisplayName
                     for await appActivity in categoryActivity.applications {
                         let bundleID = appActivity.application.bundleIdentifier ?? "unknown"
                         let name = appActivity.application.localizedDisplayName ?? bundleID
-                        accumulate(bundleID: bundleID, displayName: name, duration: appActivity.totalActivityDuration, appleCategory: appleCategory)
+                        accumulate(bundleID: bundleID, displayName: name, duration: appActivity.totalActivityDuration)
                     }
                 }
             }
@@ -56,7 +55,7 @@ struct TotalActivityReport: DeviceActivityReportScene {
                 bundleID: bundleID,
                 displayName: info.displayName,
                 minutes: info.minutes,
-                category: CategoryClassifier.classify(bundleID: bundleID, appleCategory: info.appleCategory)
+                category: CategoryClassifier.classify(bundleID: bundleID)
             )
         }
 
@@ -87,6 +86,9 @@ struct TotalActivityView: View {
         )
         if let data = try? JSONEncoder().encode(receipt) {
             defaults?.set(data, forKey: "today.receipt")
+            // Extension processes are killed aggressively; synchronize() ensures
+            // the write reaches the shared container before termination.
+            defaults?.synchronize()
         }
     }
 }
@@ -166,31 +168,12 @@ struct SpentSettings: Codable {
 struct CategoryClassifier: Codable {
     var overrides: [String: AppCategory] = [:]
 
-    static func classify(bundleID: String, appleCategory: String?) -> AppCategory {
+    static func classify(bundleID: String) -> AppCategory {
         let defaults = UserDefaults(suiteName: "group.app.spent")
-        if let data = defaults?.data(forKey: "spent.categoryOverrides"),
-           let classifier = try? JSONDecoder().decode(CategoryClassifier.self, from: data),
-           let override = classifier.overrides[bundleID] {
-            return override
+        guard let data = defaults?.data(forKey: "spent.categoryOverrides"),
+              let classifier = try? JSONDecoder().decode(CategoryClassifier.self, from: data) else {
+            return .neutral
         }
-        return defaultCategory(for: appleCategory)
+        return classifier.overrides[bundleID] ?? .neutral
     }
-
-    static func defaultCategory(for appleCategory: String?) -> AppCategory {
-        guard let cat = appleCategory?.lowercased() else { return .neutral }
-        if spentCategories.contains(where: { cat.contains($0) }) { return .spent }
-        if investedCategories.contains(where: { cat.contains($0) }) { return .invested }
-        return .neutral
-    }
-
-    private static let spentCategories = [
-        "social", "entertainment", "game", "photo", "video",
-        "shopping", "food", "sports", "news", "magazine"
-    ]
-
-    private static let investedCategories = [
-        "productivity", "education", "reference", "book",
-        "business", "finance", "health", "fitness",
-        "developer", "medical", "navigation", "utilities"
-    ]
 }
