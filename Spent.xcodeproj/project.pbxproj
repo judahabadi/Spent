@@ -371,7 +371,6 @@
 			dstSubfolderSpec = 13;
 			files = (
 				AA00002D000000000000001C /* SpentWidgets.appex in Embed App Extensions */,
-				AA00003D000000000000001C /* SpentActivityReport.appex in Embed App Extensions */,
 				AA00004D000000000000001C /* SpentActivityMonitor.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
@@ -380,9 +379,10 @@
 		AA00001D0000000000000050 /* Embed ExtensionKit Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
+			dstPath = "Extensions";
 			dstSubfolderSpec = 16;
 			files = (
+				AA00003D000000000000001D /* SpentActivityReport.appex in Embed ExtensionKit Extensions */,
 			);
 			name = "Embed ExtensionKit Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
