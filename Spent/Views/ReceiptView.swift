@@ -47,6 +47,18 @@ struct ReceiptView: View {
             DeviceActivityReport(.init("totalActivity"), filter: todayFilter)
                 .id(appVM.reportRefreshID)
                 .frame(height: 40)
+                .background(
+                    // Diagnostic: record the actual laid-out size. A 0×0 frame
+                    // silently prevents the OS from launching the report extension.
+                    GeometryReader { geo in
+                        Color.clear.onAppear {
+                            UserDefaults(suiteName: "group.app.spent")?.set(
+                                "\(Int(geo.size.width))x\(Int(geo.size.height))",
+                                forKey: "spent.diag.report.size"
+                            )
+                        }
+                    }
+                )
             ScrollView {
                 VStack(spacing: 0) {
                     periodToggle
