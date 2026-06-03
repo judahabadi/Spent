@@ -238,6 +238,13 @@ struct SettingsView: View {
         let monDiag = ud?.string(forKey: "spent.monitoring.diagnostics") ?? "not started"
         let monOK = monDiag.contains("started=20") || monDiag.contains("started=1")
 
+        // Extension process init timestamp — written in SpentActivityReportExtension.init()
+        // BEFORE makeConfiguration. Shows "never" if extension process never launches.
+        let extInitTs = ud?.double(forKey: "spent.diag.ext.init") ?? 0
+        let extInitStatus = extInitTs > 0
+            ? Date(timeIntervalSince1970: extInitTs).formatted(.dateTime.hour().minute().second())
+            : "never"
+
         return Section("Diagnostics") {
             HStack {
                 Text("Auth status")
@@ -253,6 +260,11 @@ struct SettingsView: View {
                 Text("Extension location")
                 Spacer()
                 Text(extLocation).foregroundStyle(inExtensions ? .green : .red)
+            }
+            HStack {
+                Text("Ext process init")
+                Spacer()
+                Text(extInitStatus).foregroundStyle(extInitStatus == "never" ? .red : .green)
             }
             HStack {
                 Text("Ext process alive")
