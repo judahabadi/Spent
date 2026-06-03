@@ -245,6 +245,21 @@ struct SettingsView: View {
             ? Date(timeIntervalSince1970: extInitTs).formatted(.dateTime.hour().minute().second())
             : "never"
 
+        // Read the extension's embedded provisioning profile to check what entitlements
+        // are actually granted in the signed binary (family-controls + app group required).
+        let extBundlePath = Bundle.main.bundlePath + "/Extensions/SpentActivityReport.appex"
+        let provPath = extBundlePath + "/embedded.mobileprovision"
+        let provData = FileManager.default.contents(atPath: provPath)
+        let provStr = provData.flatMap { String(bytes: $0, encoding: .ascii) } ?? ""
+        let provHasFC = provStr.contains("family-controls")
+        let provHasAG = provStr.contains("group.app.spent")
+        let provExists = provData != nil
+        let provStatus: String = {
+            if !provExists { return "no profile (dev build?)" }
+            return "FC:\(provHasFC ? "✓" : "✗") AG:\(provHasAG ? "✓" : "✗")"
+        }()
+        let provOK = provHasFC && provHasAG
+
         return Section("Diagnostics") {
             HStack {
                 Text("Auth status")
@@ -260,6 +275,11 @@ struct SettingsView: View {
                 Text("Extension location")
                 Spacer()
                 Text(extLocation).foregroundStyle(inExtensions ? .green : .red)
+            }
+            HStack {
+                Text("Ext provisioning")
+                Spacer()
+                Text(provStatus).foregroundStyle(provOK ? .green : .red)
             }
             HStack {
                 Text("Ext process init")
