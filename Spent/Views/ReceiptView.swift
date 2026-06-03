@@ -38,18 +38,21 @@ struct ReceiptView: View {
     }
 
     private var receiptPane: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                headerBar
-                // Extension trigger — must be a direct VStack child at 40pt to reliably
-                // invoke makeConfiguration. Extension renders Color.clear so nothing shows.
-                DeviceActivityReport(.init("totalActivity"), filter: todayFilter)
-                    .frame(height: 40)
-                    .id(appVM.reportRefreshID)
-                periodToggle
-                receiptCard
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 40)
+        VStack(spacing: 0) {
+            headerBar
+            // Keep DeviceActivityReport OUTSIDE the ScrollView so it is always
+            // in the viewport and never lazily unloaded. No .id() — letting it
+            // persist gives the system time to invoke makeConfiguration without
+            // the view being destroyed mid-invocation every 30 seconds.
+            DeviceActivityReport(.init("totalActivity"), filter: todayFilter)
+                .frame(height: 40)
+            ScrollView {
+                VStack(spacing: 0) {
+                    periodToggle
+                    receiptCard
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 40)
+                }
             }
         }
     }
