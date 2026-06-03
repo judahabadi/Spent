@@ -127,11 +127,12 @@ struct TotalActivityView: View {
         let agOK = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: "group.app.spent"
         ) != nil
-        let status = "EXT OK | AG:\(agOK ? "OK" : "NIL") | \(configuration.appUsages.count) apps"
+        let status = "★ EXT RUNNING | AG:\(agOK ? "OK" : "NIL") | \(configuration.appUsages.count) apps ★"
         return Text(status)
-            .font(.system(size: 11, weight: .bold, design: .monospaced))
-            .foregroundColor(agOK ? .green : .red)
+            .font(.system(size: 13, weight: .heavy, design: .monospaced))
+            .foregroundColor(.white)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(agOK ? Color.green : Color.red)
     }
 }
 
