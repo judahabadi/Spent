@@ -8,7 +8,7 @@ struct ReceiptView: View {
     private var todayFilter: DeviceActivityFilter {
         let start = Calendar.current.startOfDay(for: .now)
         return DeviceActivityFilter(
-            segment: .hourly(during: DateInterval(start: start, end: .now))
+            segment: .daily(during: DateInterval(start: start, end: .now))
         )
     }
 
@@ -40,12 +40,25 @@ struct ReceiptView: View {
     private var receiptPane: some View {
         VStack(spacing: 0) {
             headerBar
-            // Keep DeviceActivityReport OUTSIDE the ScrollView so it is always
-            // in the viewport and never lazily unloaded. No .id() — letting it
-            // persist gives the system time to invoke makeConfiguration without
-            // the view being destroyed mid-invocation every 30 seconds.
+            // Outside ScrollView so it is always in the viewport. .id() forces
+            // a new view when reportRefreshID changes, giving the extension a
+            // fresh render request. Daily filter matches the daily monitoring
+            // schedule; per Apple docs, extension is called mid-interval.
             DeviceActivityReport(.init("totalActivity"), filter: todayFilter)
+                .id(appVM.reportRefreshID)
                 .frame(height: 40)
+                .background(
+                    // Diagnostic: record the actual laid-out size. A 0×0 frame
+                    // silently prevents the OS from launching the report extension.
+                    GeometryReader { geo in
+                        Color.clear.onAppear {
+                            UserDefaults(suiteName: "group.app.spent")?.set(
+                                "\(Int(geo.size.width))x\(Int(geo.size.height))",
+                                forKey: "spent.diag.report.size"
+                            )
+                        }
+                    }
+                )
             ScrollView {
                 VStack(spacing: 0) {
                     periodToggle

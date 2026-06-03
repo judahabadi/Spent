@@ -343,7 +343,7 @@ struct EmailAuthView: View {
                     } label: {
                         Group {
                             if isLoading {
-                                ProgressView().tint(.background)
+                                ProgressView().tint(Color(.systemBackground))
                             } else {
                                 Text(isSignUp ? "Create Account" : "Sign In")
                                     .font(.system(size: 16, weight: .semibold, design: .monospaced))

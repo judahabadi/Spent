@@ -236,7 +236,7 @@ struct SettingsView: View {
 
         // Monitoring schedule diagnostic written by startMonitoring()
         let monDiag = ud?.string(forKey: "spent.monitoring.diagnostics") ?? "not started"
-        let monOK = monDiag.contains("started=20") || monDiag.contains("started=1")
+        let monOK = monDiag.contains("started=1") || monDiag.contains("started=20")
 
         // Extension process init timestamp — written in SpentActivityReportExtension.init()
         // BEFORE makeConfiguration. Shows "never" if extension process never launches.
@@ -260,6 +260,35 @@ struct SettingsView: View {
         }()
         let provOK = provHasFC && provHasAG
 
+        // LAUNCH-FAILURE PROBES — these target WHY the extension process never
+        // starts (init never fires). A report extension is launched by the OS
+        // only if (a) the shipped bundle is structurally valid, (b) it is signed,
+        // and (c) the DeviceActivityReport view is laid out with a non-zero size.
+        let fmp = FileManager.default
+
+        // (a) Shipped bundle structure: read the Info.plist the OS actually sees
+        // (not our source plist) plus confirm the executable is present.
+        let extBundle = Bundle(path: extBundlePath)
+        let shippedPointID = (extBundle?.infoDictionary?["EXAppExtensionAttributes"] as? [String: Any])?["EXExtensionPointIdentifier"] as? String
+        let pointIDStatus: String = {
+            guard let id = shippedPointID else { return "MISSING ✗" }
+            return id == "com.apple.deviceactivityui.report-extension" ? "report ✓" : id
+        }()
+        let pointIDOK = shippedPointID == "com.apple.deviceactivityui.report-extension"
+
+        let exePresent = fmp.fileExists(atPath: extBundlePath + "/SpentActivityReport")
+
+        // (b) Code signature directory must exist for the OS to launch the appex.
+        let sigPresent = fmp.fileExists(atPath: extBundlePath + "/_CodeSignature")
+        let bundleStatus = "exe:\(exePresent ? "✓" : "✗") sig:\(sigPresent ? "✓" : "✗")"
+        let bundleOK = exePresent && sigPresent
+
+        // (c) Rendered size of the DeviceActivityReport view, captured live in
+        // ReceiptView. "0x0" or "—" means the view never got a real layout, which
+        // silently prevents the OS from launching the extension.
+        let reportSize = ud?.string(forKey: "spent.diag.report.size") ?? "—"
+        let sizeOK = !(reportSize == "—" || reportSize.hasPrefix("0x") || reportSize.hasSuffix("x0"))
+
         return Section("Diagnostics") {
             HStack {
                 Text("Auth status")
@@ -280,6 +309,21 @@ struct SettingsView: View {
                 Text("Ext provisioning")
                 Spacer()
                 Text(provStatus).foregroundStyle(provOK ? .green : .red)
+            }
+            HStack {
+                Text("Ext point id")
+                Spacer()
+                Text(pointIDStatus).foregroundStyle(pointIDOK ? .green : .red)
+            }
+            HStack {
+                Text("Ext bundle")
+                Spacer()
+                Text(bundleStatus).foregroundStyle(bundleOK ? .green : .red)
+            }
+            HStack {
+                Text("Report view size")
+                Spacer()
+                Text(reportSize).foregroundStyle(sizeOK ? .green : .red)
             }
             HStack {
                 Text("Ext process init")
