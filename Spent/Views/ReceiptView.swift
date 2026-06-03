@@ -8,7 +8,7 @@ struct ReceiptView: View {
     private var todayFilter: DeviceActivityFilter {
         let start = Calendar.current.startOfDay(for: .now)
         return DeviceActivityFilter(
-            segment: .daily(during: DateInterval(start: start, end: .now))
+            segment: .hourly(during: DateInterval(start: start, end: .now))
         )
     }
 
