@@ -380,7 +380,7 @@
 		AA00001D0000000000000050 /* Embed ExtensionKit Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
+			dstPath = "Extensions";
 			dstSubfolderSpec = 16;
 			files = (
 			);
