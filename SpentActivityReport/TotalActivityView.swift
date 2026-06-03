@@ -24,6 +24,12 @@ struct TotalActivityReport: DeviceActivityReportScene {
     }
 
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> ReceiptConfiguration {
+        // Increment call counter so the main app can confirm this runs.
+        let ud = UserDefaults(suiteName: "group.app.spent")
+        let n = (ud?.integer(forKey: "spent.diag.calls") ?? 0) + 1
+        ud?.set(n, forKey: "spent.diag.calls")
+        ud?.set(Date.now.timeIntervalSince1970, forKey: "spent.diag.ts")
+
         var totals: [String: (displayName: String, minutes: Int)] = [:]
 
         func accumulate(bundleID: String, displayName: String, duration: TimeInterval) {
