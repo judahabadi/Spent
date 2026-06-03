@@ -37,15 +37,10 @@ final class AppViewModel {
             streak = await cloudKit.fetchStreak()
             await loadTodayReceipt()
             startLiveUpdates()
-            // DeviceActivityReport renders after initialize() returns and triggers the
-            // extension asynchronously. Poll at increasing intervals so the receipt
-            // populates within seconds rather than waiting for the 30-second timer.
+            // Extension needs a few seconds to run on first launch before data is in the App Group
             Task {
-                for delay: Double in [4, 10, 20] {
-                    try? await Task.sleep(for: .seconds(delay))
-                    await loadTodayReceipt()
-                    if !self.todayReceipt.apps.isEmpty { break }
-                }
+                try? await Task.sleep(for: .seconds(5))
+                await loadTodayReceipt()
             }
         }
     }
@@ -57,23 +52,22 @@ final class AppViewModel {
         return days >= 7
     }
 
-    var receiptLoadStatus: String = "not loaded"
-
     func loadTodayReceipt() async {
+        // In production: read from DeviceActivity report extension shared container
+        // Here: build from cached shared UserDefaults suite
         let cached = SharedDataStore.loadTodayReceipt()
         await MainActor.run {
-            self.receiptLoadStatus = SharedDataStore.lastLoadStatus
             self.todayReceipt = cached ?? .empty(date: .now, hourlyRate: settings.hourlyRate, mode: settings.userMode)
         }
     }
 
     func startLiveUpdates() {
         updateTimer?.invalidate()
-        updateTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+        updateTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in
                 guard let self else { return }
-                self.reportRefreshID = UUID()      // forces DeviceActivityReport re-render → extension re-runs
-                try? await Task.sleep(for: .seconds(8))   // wait for extension to finish writing
+                self.reportRefreshID = UUID()
+                try? await Task.sleep(for: .seconds(3))
                 await self.loadTodayReceipt()
             }
         }
@@ -186,66 +180,27 @@ struct SpentSettings: Codable {
 // Shared data store for app group communication with extensions
 struct SharedDataStore {
     private static let suite = UserDefaults(suiteName: "group.app.spent")
-    private static let groupID = "group.app.spent"
-
-    // Last diagnostic from loadTodayReceipt — shown in Settings for debugging.
-    static var lastLoadStatus: String = "not loaded"
+    private static let receiptKey = "today.receipt"
 
     static func loadTodayReceipt() -> DailyReceipt? {
-        let containerURL = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: groupID
-        )
-
-        // Primary: simple flat format written by the extension in makeConfiguration.
-        // Uses only String/Int — no associated-value enum Codable issues possible.
-        if let containerURL {
-            let simpleURL = containerURL.appendingPathComponent("apps-simple.json")
-            if let data = try? Data(contentsOf: simpleURL) {
-                struct SimpleApp: Codable { var b: String; var n: String; var m: Int; var c: String }
-                if let simpleApps = try? JSONDecoder().decode([SimpleApp].self, from: data),
-                   !simpleApps.isEmpty {
-                    let settings = SpentSettings.load()
-                    let apps = simpleApps.map { app in
-                        AppUsage(
-                            id: UUID(),
-                            bundleID: app.b,
-                            displayName: app.n,
-                            minutes: app.m,
-                            category: AppCategory(rawValue: app.c) ?? .neutral
-                        )
-                    }
-                    lastLoadStatus = "ok:\(apps.count)apps"
-                    return DailyReceipt(
-                        id: UUID(),
-                        date: .now,
-                        apps: apps,
-                        hourlyRate: settings.hourlyRate,
-                        mode: settings.userMode
-                    )
-                } else {
-                    lastLoadStatus = "simple-parse-fail(\(data.count)b)"
-                }
-            } else {
-                lastLoadStatus = "no-file"
-            }
-        } else {
-            lastLoadStatus = "container-nil"
-        }
-
-        // Secondary: full receipt JSON.
-        if let containerURL {
+        // Primary: read from the file the extension writes directly.
+        if let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.app.spent"
+        ) {
             let fileURL = containerURL.appendingPathComponent("today.receipt")
-            if let data = try? Data(contentsOf: fileURL) {
-                do {
-                    let receipt = try JSONDecoder().decode(DailyReceipt.self, from: data)
-                    lastLoadStatus = "full-ok:\(receipt.apps.count)apps"
-                    return receipt
-                } catch {
-                    lastLoadStatus = "full-err:\(error)"
-                }
+            if let data = try? Data(contentsOf: fileURL),
+               let receipt = try? JSONDecoder().decode(DailyReceipt.self, from: data) {
+                return receipt
             }
         }
+        // Fallback: try UserDefaults App Group.
+        suite?.synchronize()
+        guard let data = suite?.data(forKey: receiptKey) else { return nil }
+        return try? JSONDecoder().decode(DailyReceipt.self, from: data)
+    }
 
-        return nil
+    static func saveTodayReceipt(_ receipt: DailyReceipt) {
+        guard let data = try? JSONEncoder().encode(receipt) else { return }
+        suite?.set(data, forKey: receiptKey)
     }
 }

@@ -41,8 +41,8 @@ struct ReceiptView: View {
         ScrollView {
             VStack(spacing: 0) {
                 headerBar
-                // Triggers makeConfiguration in the extension. Must be a direct VStack
-                // child to reliably fire. Extension renders Color.clear — nothing visible.
+                // Extension trigger — must be a direct VStack child at 40pt to reliably
+                // invoke makeConfiguration. Extension renders Color.clear so nothing shows.
                 DeviceActivityReport(.init("totalActivity"), filter: todayFilter)
                     .frame(height: 40)
                     .id(appVM.reportRefreshID)

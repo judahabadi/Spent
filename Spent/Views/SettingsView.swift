@@ -167,6 +167,28 @@ struct SettingsView: View {
         }
     }
 
+    private var dataSection: some View {
+        let receipt = appVM.todayReceipt
+        let appCount = receipt.apps.count
+        let lastUpdate = appCount > 0
+            ? receipt.date.formatted(.dateTime.hour().minute().second())
+            : "not yet received"
+        return Section("Screen Time Data") {
+            HStack {
+                Text("Last received")
+                Spacer()
+                Text(lastUpdate)
+                    .foregroundStyle(.secondary)
+            }
+            HStack {
+                Text("Apps today")
+                Spacer()
+                Text(appCount > 0 ? "\(appCount)" : "—")
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
     private var subscriptionSection: some View {
         Section("Subscription") {
             if appVM.storeKit.isSubscribed {
@@ -192,27 +214,6 @@ struct SettingsView: View {
                     Text("Unlock Full Receipt — $1/mo")
                         .foregroundStyle(.primary)
                 }
-            }
-        }
-    }
-
-    private var dataSection: some View {
-        let appCount = appVM.todayReceipt.apps.count
-        return Section("Screen Time Data") {
-            HStack {
-                Text("Apps today")
-                Spacer()
-                Text(appCount > 0 ? "\(appCount)" : "—")
-                    .foregroundStyle(.secondary)
-            }
-            HStack {
-                Text("Status")
-                Spacer()
-                Text(appVM.receiptLoadStatus)
-                    .font(.system(size: 11, design: .monospaced))
-                    .foregroundStyle(appVM.receiptLoadStatus.hasPrefix("ok") || appVM.receiptLoadStatus.hasPrefix("full-ok") ? .green : .orange)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.trailing)
             }
         }
     }
