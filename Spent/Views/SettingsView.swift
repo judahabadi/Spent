@@ -6,11 +6,13 @@ struct SettingsView: View {
     @Environment(AppViewModel.self) private var appVM
     @Environment(\.dismiss) private var dismiss
     @State private var showDeleteConfirm = false
+    @State private var showAppSelection = false
 
     var body: some View {
         NavigationStack {
             List {
                 rateSection
+                trackedAppsSection
                 notificationsSection
                 securitySection
                 accountSection
@@ -113,6 +115,27 @@ struct SettingsView: View {
                         Text(p.label).tag(p)
                     }
                 }
+            }
+        }
+    }
+
+    private var trackedAppsSection: some View {
+        let count = UserDefaults(suiteName: "group.app.spent")?.integer(forKey: "spent.apps.count") ?? 0
+        return Section("Tracked Apps") {
+            HStack {
+                Text("Apps tracked")
+                Spacer()
+                Text(count > 0 ? "\(count)" : "None")
+                    .foregroundStyle(.secondary)
+            }
+            Button {
+                showAppSelection = true
+            } label: {
+                Text(count > 0 ? "Change apps" : "Select apps to track")
+                    .foregroundStyle(.primary)
+            }
+            .sheet(isPresented: $showAppSelection) {
+                AppSelectionView()
             }
         }
     }
