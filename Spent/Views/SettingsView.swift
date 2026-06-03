@@ -1,5 +1,6 @@
 import SwiftUI
 import LocalAuthentication
+import FamilyControls
 
 struct SettingsView: View {
     @Environment(AppViewModel.self) private var appVM
@@ -204,6 +205,17 @@ struct SettingsView: View {
         let fileSize = attrs?[.size] as? Int ?? -1
         let fileStatus = fileSize >= 0 ? "\(fileSize) bytes" : "missing"
 
+        // ext-alive.txt is written at the TOP of makeConfiguration (before data iteration)
+        // so its presence proves the extension process launched even if the app group fails.
+        let aliveURL = containerURL?.appendingPathComponent("ext-alive.txt")
+        let aliveContent = aliveURL.flatMap { try? String(contentsOf: $0, encoding: .utf8) }
+        let aliveStatus: String = {
+            guard let s = aliveContent, let pipe = s.firstIndex(of: "|") else { return "never" }
+            let tsVal = Double(s[s.startIndex..<pipe]) ?? 0
+            guard tsVal > 0 else { return "never" }
+            return Date(timeIntervalSince1970: tsVal).formatted(.dateTime.hour().minute().second())
+        }()
+
         // Check where the extension binary actually landed in the app bundle.
         let fm = FileManager.default
         let bundlePath = Bundle.main.bundlePath
@@ -211,11 +223,41 @@ struct SettingsView: View {
         let inExtensions = fm.fileExists(atPath: bundlePath + "/Extensions/SpentActivityReport.appex")
         let extLocation = inExtensions ? "Extensions/ ✓" : (inPlugIns ? "PlugIns/ ✗" : "NOT FOUND ✗")
 
+        // FamilyControls authorization status
+        let authStatus: String = {
+            switch appVM.screenTime.authorizationStatus {
+            case .approved: return "approved ✓"
+            case .denied: return "denied ✗"
+            case .notDetermined: return "not determined"
+            @unknown default: return "unknown"
+            }
+        }()
+        let authOK = appVM.screenTime.authorizationStatus == .approved
+
+        // Monitoring schedule diagnostic written by startMonitoring()
+        let monDiag = ud?.string(forKey: "spent.monitoring.diagnostics") ?? "not started"
+        let monOK = monDiag.contains("started=20") || monDiag.contains("started=1")
+
         return Section("Diagnostics") {
+            HStack {
+                Text("Auth status")
+                Spacer()
+                Text(authStatus).foregroundStyle(authOK ? .green : .red)
+            }
+            HStack {
+                Text("Monitoring")
+                Spacer()
+                Text(monDiag).foregroundStyle(monOK ? .green : .orange)
+            }
             HStack {
                 Text("Extension location")
                 Spacer()
                 Text(extLocation).foregroundStyle(inExtensions ? .green : .red)
+            }
+            HStack {
+                Text("Ext process alive")
+                Spacer()
+                Text(aliveStatus).foregroundStyle(aliveStatus == "never" ? .red : .green)
             }
             HStack {
                 Text("makeConfig calls")
