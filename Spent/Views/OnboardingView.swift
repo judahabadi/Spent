@@ -4,7 +4,8 @@ import AuthenticationServices
 struct OnboardingView: View {
     @Environment(AppViewModel.self) private var appVM
     @State private var page = 0
-    @State private var showEmailAuth = false
+    @State private var showEmailSignIn = false
+    @State private var showEmailSignUp = false
 
     var body: some View {
         ZStack {
@@ -23,8 +24,11 @@ struct OnboardingView: View {
                     .padding(.bottom, 40)
             }
         }
-        .sheet(isPresented: $showEmailAuth) {
-            EmailAuthView()
+        .sheet(isPresented: $showEmailSignIn) {
+            EmailAuthView(startInSignUpMode: false)
+        }
+        .sheet(isPresented: $showEmailSignUp) {
+            EmailAuthView(startInSignUpMode: true)
         }
     }
 
@@ -94,10 +98,23 @@ struct OnboardingView: View {
             .padding(.horizontal, 32)
 
             Button {
-                showEmailAuth = true
+                showEmailSignUp = true
             } label: {
-                Text("Use email instead")
-                    .font(.system(size: 13, design: .monospaced))
+                Text("Create Account with Email")
+                    .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color(.secondarySystemBackground))
+                    .foregroundStyle(.primary)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+            }
+            .padding(.horizontal, 32)
+
+            Button {
+                showEmailSignIn = true
+            } label: {
+                Text("Already have an account? Sign in")
+                    .font(.system(size: 12, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
             .padding(.bottom, 80)
@@ -262,85 +279,104 @@ struct OnboardingView: View {
 }
 
 struct EmailAuthView: View {
+    var startInSignUpMode: Bool = false
+
     @Environment(AppViewModel.self) private var appVM
     @Environment(\.dismiss) private var dismiss
     @State private var email = ""
     @State private var password = ""
-    @State private var isSignUp = false
+    @State private var isSignUp: Bool
     @State private var isLoading = false
     @State private var error: String?
 
+    init(startInSignUpMode: Bool = false) {
+        self.startInSignUpMode = startInSignUpMode
+        _isSignUp = State(initialValue: startInSignUpMode)
+    }
+
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                TextField("Email", text: $email)
-                    .keyboardType(.emailAddress)
-                    .autocapitalization(.none)
-                    .font(.system(size: 15, design: .monospaced))
-                    .padding()
-                    .background(Color(.secondarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 4))
+            ScrollView {
+                VStack(spacing: 16) {
+                    VStack(spacing: 0) {
+                        TextField("Email", text: $email)
+                            .keyboardType(.emailAddress)
+                            .autocapitalization(.none)
+                            .textContentType(.emailAddress)
+                            .font(.system(size: 15, design: .monospaced))
+                            .padding()
+                            .background(Color(.secondarySystemBackground))
 
-                SecureField("Password", text: $password)
-                    .font(.system(size: 15, design: .monospaced))
-                    .padding()
-                    .background(Color(.secondarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                        Divider()
 
-                if let error {
-                    Text(error)
-                        .font(.system(size: 12, design: .monospaced))
-                        .foregroundStyle(.red)
-                }
+                        SecureField("Password", text: $password)
+                            .textContentType(isSignUp ? .newPassword : .password)
+                            .font(.system(size: 15, design: .monospaced))
+                            .padding()
+                            .background(Color(.secondarySystemBackground))
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
 
-                Button {
-                    Task {
-                        isLoading = true
-                        do {
-                            if isSignUp {
-                                try await appVM.auth.signUpWithEmail(email, password: password)
-                            } else {
-                                try await appVM.auth.signInWithEmail(email, password: password)
+                    if let error {
+                        Text(error)
+                            .font(.system(size: 12, design: .monospaced))
+                            .foregroundStyle(.red)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
+                    Button {
+                        Task {
+                            isLoading = true
+                            error = nil
+                            do {
+                                if isSignUp {
+                                    try await appVM.auth.signUpWithEmail(email, password: password)
+                                } else {
+                                    try await appVM.auth.signInWithEmail(email, password: password)
+                                }
+                                dismiss()
+                            } catch {
+                                self.error = error.localizedDescription
                             }
-                            dismiss()
-                        } catch {
-                            self.error = error.localizedDescription
+                            isLoading = false
                         }
-                        isLoading = false
+                    } label: {
+                        Group {
+                            if isLoading {
+                                ProgressView().tint(.background)
+                            } else {
+                                Text(isSignUp ? "Create Account" : "Sign In")
+                                    .font(.system(size: 16, weight: .semibold, design: .monospaced))
+                                    .frame(maxWidth: .infinity)
+                            }
+                        }
                     }
-                } label: {
-                    if isLoading {
-                        ProgressView()
-                    } else {
-                        Text(isSignUp ? "Sign Up" : "Sign In")
-                            .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                            .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(.primary)
+                    .foregroundStyle(.background)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                    Button {
+                        withAnimation { isSignUp.toggle() }
+                        error = nil
+                    } label: {
+                        Text(isSignUp ? "Already have an account? Sign in" : "Don't have an account? Create one")
+                            .font(.system(size: 12, design: .monospaced))
+                            .foregroundStyle(.secondary)
                     }
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(.primary)
-                .foregroundStyle(.background)
-                .clipShape(RoundedRectangle(cornerRadius: 4))
-
-                Button {
-                    isSignUp.toggle()
-                } label: {
-                    Text(isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up")
-                        .font(.system(size: 12, design: .monospaced))
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
+                .padding(24)
             }
-            .padding(24)
-            .navigationTitle(isSignUp ? "Sign Up" : "Sign In")
+            .navigationTitle(isSignUp ? "Create Account" : "Sign In")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
+                        .font(.system(size: 14, design: .monospaced))
                 }
             }
         }
+        .fontDesign(.monospaced)
     }
 }
