@@ -24,6 +24,12 @@ struct TotalActivityReport: DeviceActivityReportScene {
     }
 
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> ReceiptConfiguration {
+        // Increment call counter so the main app can confirm this runs.
+        let ud = UserDefaults(suiteName: "group.app.spent")
+        let n = (ud?.integer(forKey: "spent.diag.calls") ?? 0) + 1
+        ud?.set(n, forKey: "spent.diag.calls")
+        ud?.set(Date.now.timeIntervalSince1970, forKey: "spent.diag.ts")
+
         var totals: [String: (displayName: String, minutes: Int)] = [:]
 
         func accumulate(bundleID: String, displayName: String, duration: TimeInterval) {
@@ -59,30 +65,43 @@ struct TotalActivityReport: DeviceActivityReportScene {
             )
         }
 
-        let receipt = DailyReceipt(
-            id: UUID(),
-            date: Date.now,
-            apps: appUsages,
-            hourlyRate: settings.hourlyRate,
-            mode: settings.userMode
-        )
-        if let encoded = try? JSONEncoder().encode(receipt) {
-            // Primary: write to a file in the App Group container.
-            // This is more reliable than UserDefaults across processes.
-            if let containerURL = FileManager.default.containerURL(
-                forSecurityApplicationGroupIdentifier: "group.app.spent"
-            ) {
-                let fileURL = containerURL.appendingPathComponent("today.receipt")
-                try? encoded.write(to: fileURL, options: .atomicWrite)
+        // Write to App Group container. Two formats for maximum reliability:
+        // 1. apps-simple.json — pure primitives, no Codable complexity. Primary read path.
+        // 2. today.receipt   — full JSON, secondary fallback.
+        if let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.app.spent"
+        ) {
+            let simpleApps = appUsages.map {
+                SimpleApp(b: $0.bundleID, n: $0.displayName, m: $0.minutes, c: $0.category.rawValue)
             }
-            // Fallback: also write via UserDefaults in case file write fails.
-            let defaults = UserDefaults(suiteName: "group.app.spent")
-            defaults?.set(encoded, forKey: "today.receipt")
-            defaults?.synchronize()
+            if let simpleData = try? JSONEncoder().encode(simpleApps) {
+                try? simpleData.write(
+                    to: containerURL.appendingPathComponent("apps-simple.json"),
+                    options: .atomicWrite
+                )
+            }
+            let receipt = DailyReceipt(
+                id: UUID(), date: Date.now, apps: appUsages,
+                hourlyRate: settings.hourlyRate, mode: settings.userMode
+            )
+            if let receiptData = try? JSONEncoder().encode(receipt) {
+                try? receiptData.write(
+                    to: containerURL.appendingPathComponent("today.receipt"),
+                    options: .atomicWrite
+                )
+            }
         }
 
         return ReceiptConfiguration(appUsages: appUsages, settings: settings)
     }
+}
+
+// Minimal struct for cross-process transfer — only primitives, no associated-value enums.
+private struct SimpleApp: Codable {
+    var b: String // bundleID
+    var n: String // displayName
+    var m: Int    // minutes
+    var c: String // category rawValue
 }
 
 // MARK: - View
@@ -176,16 +195,37 @@ struct SpentSettings: Codable {
 }
 
 // MARK: - CategoryClassifier
+// Do NOT use categoryActivity.category.localizedDisplayName — ManagedSettings property,
+// crashes for individual (non-family) authorization. Use bundle ID patterns instead.
 
 struct CategoryClassifier: Codable {
     var overrides: [String: AppCategory] = [:]
 
     static func classify(bundleID: String) -> AppCategory {
         let defaults = UserDefaults(suiteName: "group.app.spent")
-        guard let data = defaults?.data(forKey: "spent.categoryOverrides"),
-              let classifier = try? JSONDecoder().decode(CategoryClassifier.self, from: data) else {
-            return .neutral
+        if let data = defaults?.data(forKey: "spent.categoryOverrides"),
+           let classifier = try? JSONDecoder().decode(CategoryClassifier.self, from: data),
+           let override = classifier.overrides[bundleID] {
+            return override
         }
-        return classifier.overrides[bundleID] ?? .neutral
+        return heuristic(bundleID: bundleID)
+    }
+
+    private static func heuristic(bundleID: String) -> AppCategory {
+        let id = bundleID.lowercased()
+        let spent = ["facebook", "instagram", "twitter", "snapchat", "tiktok", "bytedance",
+                     "reddit", "discord", "telegram", "whatsapp", "messenger",
+                     "netflix", "youtube", "hulu", "disneyplus", "twitch", "spotify",
+                     "tinder", "bumble", "hinge", "mobilesafari", "chrome", "firefox",
+                     "brave", "opera", "duckduckgo", "roblox", "minecraft", "fortnite"]
+        let invested = ["notion", "evernote", "todoist", "things", "omnifocus",
+                        "slack", "zoom", "msteams", "webex", "duolingo", "khanacademy",
+                        "coursera", "udemy", "kindle", "strava", "myfitnesspal",
+                        "headspace", "calm", "xcode", "github", "pages", "numbers",
+                        "keynote", "word", "excel", "mobilenotes", "reminders",
+                        "photoshop", "lightroom"]
+        if spent.contains(where: { id.contains($0) }) { return .spent }
+        if invested.contains(where: { id.contains($0) }) { return .invested }
+        return .neutral
     }
 }

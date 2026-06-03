@@ -15,6 +15,7 @@ struct SettingsView: View {
                 accountSection
                 subscriptionSection
                 dataSection
+                diagnosticSection
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -185,6 +186,44 @@ struct SettingsView: View {
                 Spacer()
                 Text(appCount > 0 ? "\(appCount)" : "—")
                     .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private var diagnosticSection: some View {
+        let ud = UserDefaults(suiteName: "group.app.spent")
+        let calls = ud?.integer(forKey: "spent.diag.calls") ?? 0
+        let ts = ud?.double(forKey: "spent.diag.ts") ?? 0
+        let lastCall = ts > 0
+            ? Date(timeIntervalSince1970: ts).formatted(.dateTime.hour().minute().second())
+            : "never"
+
+        let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.app.spent")
+        let fileURL = containerURL?.appendingPathComponent("apps-simple.json")
+        let attrs = fileURL.flatMap { try? FileManager.default.attributesOfItem(atPath: $0.path) }
+        let fileSize = attrs?[.size] as? Int ?? -1
+        let fileStatus = fileSize >= 0 ? "\(fileSize) bytes" : "missing"
+
+        return Section("Diagnostics") {
+            HStack {
+                Text("makeConfig calls")
+                Spacer()
+                Text("\(calls)").foregroundStyle(calls > 0 ? .green : .red)
+            }
+            HStack {
+                Text("Last call")
+                Spacer()
+                Text(lastCall).foregroundStyle(.secondary)
+            }
+            HStack {
+                Text("apps-simple.json")
+                Spacer()
+                Text(fileStatus).foregroundStyle(fileSize > 2 ? .green : .orange)
+            }
+            HStack {
+                Text("Apps in receipt")
+                Spacer()
+                Text("\(appVM.todayReceipt.apps.count)").foregroundStyle(appVM.todayReceipt.apps.count > 0 ? .green : .red)
             }
         }
     }
