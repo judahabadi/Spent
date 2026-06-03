@@ -236,7 +236,7 @@ struct SettingsView: View {
 
         // Monitoring schedule diagnostic written by startMonitoring()
         let monDiag = ud?.string(forKey: "spent.monitoring.diagnostics") ?? "not started"
-        let monOK = monDiag.contains("started=20") || monDiag.contains("started=1")
+        let monOK = monDiag.contains("started=1") || monDiag.contains("started=20")
 
         // Extension process init timestamp — written in SpentActivityReportExtension.init()
         // BEFORE makeConfiguration. Shows "never" if extension process never launches.
