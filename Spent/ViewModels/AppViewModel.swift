@@ -37,6 +37,16 @@ final class AppViewModel {
             streak = await cloudKit.fetchStreak()
             await loadTodayReceipt()
             startLiveUpdates()
+            // DeviceActivityReport renders after initialize() returns and triggers the
+            // extension asynchronously. Poll at increasing intervals so the receipt
+            // populates within seconds rather than waiting for the 30-second timer.
+            Task {
+                for delay: Double in [4, 10, 20] {
+                    try? await Task.sleep(for: .seconds(delay))
+                    await loadTodayReceipt()
+                    if !self.todayReceipt.apps.isEmpty { break }
+                }
+            }
         }
     }
 
@@ -59,11 +69,11 @@ final class AppViewModel {
 
     func startLiveUpdates() {
         updateTimer?.invalidate()
-        updateTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+        updateTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in
                 guard let self else { return }
-                self.reportRefreshID = UUID()
-                try? await Task.sleep(for: .seconds(3))
+                self.reportRefreshID = UUID()      // forces DeviceActivityReport re-render → extension re-runs
+                try? await Task.sleep(for: .seconds(8))   // wait for extension to finish writing
                 await self.loadTodayReceipt()
             }
         }
