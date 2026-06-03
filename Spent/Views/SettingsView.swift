@@ -204,7 +204,19 @@ struct SettingsView: View {
         let fileSize = attrs?[.size] as? Int ?? -1
         let fileStatus = fileSize >= 0 ? "\(fileSize) bytes" : "missing"
 
+        // Check where the extension binary actually landed in the app bundle.
+        let fm = FileManager.default
+        let bundlePath = Bundle.main.bundlePath
+        let inPlugIns = fm.fileExists(atPath: bundlePath + "/PlugIns/SpentActivityReport.appex")
+        let inExtensions = fm.fileExists(atPath: bundlePath + "/Extensions/SpentActivityReport.appex")
+        let extLocation = inExtensions ? "Extensions/ ✓" : (inPlugIns ? "PlugIns/ ✗" : "NOT FOUND ✗")
+
         return Section("Diagnostics") {
+            HStack {
+                Text("Extension location")
+                Spacer()
+                Text(extLocation).foregroundStyle(inExtensions ? .green : .red)
+            }
             HStack {
                 Text("makeConfig calls")
                 Spacer()
