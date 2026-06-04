@@ -257,9 +257,30 @@ struct SettingsView: View {
         }()
         let authOK = appVM.screenTime.authorizationStatus == .approved
 
-        // Monitoring schedule diagnostic written by startMonitoring()
+        // Monitoring schedule diagnostic written by setupAppTracking()
         let monDiag = ud?.string(forKey: "spent.monitoring.diagnostics") ?? "not started"
-        let monOK = monDiag.contains("started=1") || monDiag.contains("started=20")
+        let monOK = monDiag.contains("started=1") || monDiag.contains("started=20") || monDiag.contains("tracking")
+
+        // THE KEY PROBE: written by SpentActivityMonitor.intervalDidEnd.
+        // If this is "never", DeviceActivityMonitor callbacks don't fire in individual
+        // mode on this device — and the threshold pivot also won't work.
+        let intervalEndDate = ud?.object(forKey: "lastIntervalEnd") as? Date
+        let monitorFired = intervalEndDate.map {
+            $0.formatted(.dateTime.hour().minute().second())
+        } ?? "never"
+        let monitorOK = intervalEndDate != nil
+
+        // Written by SpentActivityMonitor.eventDidReachThreshold.
+        // If monitorFired is non-never but this is "never", auth is working but
+        // no tracked apps have reached a threshold yet (normal early in the day).
+        let thresholdTs = ud?.double(forKey: "spent.threshold.ts") ?? 0
+        let thresholdFired = thresholdTs > 0
+            ? Date(timeIntervalSince1970: thresholdTs).formatted(.dateTime.hour().minute().second())
+            : "never"
+        let thresholdOK = thresholdTs > 0
+
+        // Tracked apps count
+        let trackedCount = ud?.integer(forKey: "spent.apps.count") ?? 0
 
         // Extension process init timestamp — written in SpentActivityReportExtension.init()
         // BEFORE makeConfiguration. Shows "never" if extension process never launches.
@@ -322,6 +343,21 @@ struct SettingsView: View {
                 Text("Monitoring")
                 Spacer()
                 Text(monDiag).foregroundStyle(monOK ? .green : .orange)
+            }
+            HStack {
+                Text("Tracked apps")
+                Spacer()
+                Text("\(trackedCount)").foregroundStyle(trackedCount > 0 ? .green : .red)
+            }
+            HStack {
+                Text("Monitor last fired")
+                Spacer()
+                Text(monitorFired).foregroundStyle(monitorOK ? .green : .red)
+            }
+            HStack {
+                Text("Last threshold")
+                Spacer()
+                Text(thresholdFired).foregroundStyle(thresholdOK ? .green : .secondary)
             }
             HStack {
                 Text("Extension location")
