@@ -121,7 +121,7 @@ struct SettingsView: View {
     }
 
     private var trackedAppsSection: some View {
-        let count = UserDefaults(suiteName: "group.app.spent")?.integer(forKey: "spent.apps.count") ?? 0
+        let count = appVM.trackedAppCount
         return Section("Tracked Apps") {
             HStack {
                 Text("Apps tracked")
@@ -228,7 +228,7 @@ struct SettingsView: View {
                 Text("Import last 30 days")
                     .foregroundStyle(.primary)
             }
-            .disabled((UserDefaults(suiteName: "group.app.spent")?.integer(forKey: "spent.apps.count") ?? 0) == 0)
+            .disabled(appVM.trackedAppCount == 0)
             .sheet(isPresented: $showBackfill) {
                 BackfillView()
             }

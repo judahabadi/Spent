@@ -26,9 +26,15 @@ final class AppViewModel {
     private var intervalEndObserver: Timer?
     private var isInitializing = false
 
+    // Observable mirror of the persisted tracked-app count so SwiftUI re-renders
+    // (e.g. RootView switching away from AppSelectionView) when apps are saved.
+    var trackedAppCount: Int = UserDefaults(suiteName: "group.app.spent")?.integer(forKey: "spent.apps.count") ?? 0
+
     // True when the user hasn't selected any apps to track yet.
-    var needsAppSetup: Bool {
-        (UserDefaults(suiteName: "group.app.spent")?.integer(forKey: "spent.apps.count") ?? 0) == 0
+    var needsAppSetup: Bool { trackedAppCount == 0 }
+
+    func refreshTrackedAppCount() {
+        trackedAppCount = UserDefaults(suiteName: "group.app.spent")?.integer(forKey: "spent.apps.count") ?? 0
     }
 
     func initialize() async {
@@ -63,6 +69,7 @@ final class AppViewModel {
 
     // Called after the user saves a new app selection so the receipt updates.
     func reloadTrackedApps() {
+        refreshTrackedAppCount()
         Task { await loadTodayReceipt() }
     }
 
