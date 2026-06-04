@@ -13,6 +13,7 @@
 		AA000005000000000000001B /* UserMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000005000000000000001A /* UserMode.swift */; };
 		AA000006000000000000001B /* StreakRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000006000000000000001A /* StreakRecord.swift */; };
 		AA000007000000000000001B /* ScreenTimeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000007000000000000001A /* ScreenTimeService.swift */; };
+		AA000098000000000000001B /* BackfillService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000098000000000000001A /* BackfillService.swift */; };
 		AA000008000000000000001B /* CalculationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000008000000000000001A /* CalculationEngine.swift */; };
 		AA000009000000000000001B /* CloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000009000000000000001A /* CloudKitService.swift */; };
 		AA00000A000000000000001B /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000A000000000000001A /* AuthService.swift */; };
@@ -101,6 +102,7 @@
 		AA000005000000000000001A /* UserMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserMode.swift; sourceTree = "<group>"; };
 		AA000006000000000000001A /* StreakRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakRecord.swift; sourceTree = "<group>"; };
 		AA000007000000000000001A /* ScreenTimeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTimeService.swift; sourceTree = "<group>"; };
+		AA000098000000000000001A /* BackfillService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackfillService.swift; sourceTree = "<group>"; };
 		AA000008000000000000001A /* CalculationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculationEngine.swift; sourceTree = "<group>"; };
 		AA000009000000000000001A /* CloudKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitService.swift; sourceTree = "<group>"; };
 		AA00000A000000000000001A /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
@@ -236,6 +238,7 @@
 			isa = PBXGroup;
 			children = (
 				AA000007000000000000001A /* ScreenTimeService.swift */,
+				AA000098000000000000001A /* BackfillService.swift */,
 				AA000008000000000000001A /* CalculationEngine.swift */,
 				AA000009000000000000001A /* CloudKitService.swift */,
 				AA00000A000000000000001A /* AuthService.swift */,
@@ -616,6 +619,7 @@
 				AA000005000000000000001B /* UserMode.swift in Sources */,
 				AA000006000000000000001B /* StreakRecord.swift in Sources */,
 				AA000007000000000000001B /* ScreenTimeService.swift in Sources */,
+				AA000098000000000000001B /* BackfillService.swift in Sources */,
 				AA000008000000000000001B /* CalculationEngine.swift in Sources */,
 				AA000009000000000000001B /* CloudKitService.swift in Sources */,
 				AA00000A000000000000001B /* AuthService.swift in Sources */,

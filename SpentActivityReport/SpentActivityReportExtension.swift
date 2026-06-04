@@ -16,5 +16,8 @@ struct SpentActivityReportExtension: DeviceActivityReportExtension {
         TotalActivityReport { config in
             TotalActivityView(configuration: config)
         }
+        BackfillReport { days in
+            BackfillSummaryView(days: days)
+        }
     }
 }
