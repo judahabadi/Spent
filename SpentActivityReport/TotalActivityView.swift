@@ -136,6 +136,102 @@ struct TotalActivityView: View {
     }
 }
 
+// MARK: - Backfill (historical) report
+
+extension DeviceActivityReport.Context {
+    static let backfill = Self("backfill")
+}
+
+// Per-day usage harvested from the historical (daily-segmented) filter.
+struct BackfillDay: Codable {
+    var date: TimeInterval     // start-of-day epoch
+    var apps: [BackfillApp]
+}
+
+struct BackfillApp: Codable {
+    var b: String // bundleID
+    var n: String // displayName
+    var m: Int    // minutes
+    var c: String // category rawValue
+}
+
+struct BackfillReport: DeviceActivityReportScene {
+    let context: DeviceActivityReport.Context = .backfill
+    let content: ([BackfillDay]) -> BackfillSummaryView
+
+    init(@ViewBuilder content: @escaping ([BackfillDay]) -> BackfillSummaryView) {
+        self.content = content
+    }
+
+    func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> [BackfillDay] {
+        let cal = Calendar.current
+        // day start-of-day -> bundleID -> (name, minutes)
+        var days: [Date: [String: (name: String, minutes: Int)]] = [:]
+
+        for await activityData in data {
+            for await segment in activityData.activitySegments {
+                let day = cal.startOfDay(for: segment.dateInterval.start)
+                for await category in segment.categories {
+                    for await app in category.applications {
+                        let minutes = Int(app.totalActivityDuration / 60)
+                        guard minutes > 0 else { continue }
+                        let bundleID = app.application.bundleIdentifier ?? "unknown"
+                        let name = app.application.localizedDisplayName ?? bundleID
+                        var dayMap = days[day] ?? [:]
+                        if let existing = dayMap[bundleID] {
+                            dayMap[bundleID] = (existing.name, existing.minutes + minutes)
+                        } else {
+                            dayMap[bundleID] = (name, minutes)
+                        }
+                        days[day] = dayMap
+                    }
+                }
+            }
+        }
+
+        let result: [BackfillDay] = days.map { day, apps in
+            BackfillDay(
+                date: day.timeIntervalSince1970,
+                apps: apps.map { bundleID, info in
+                    BackfillApp(
+                        b: bundleID,
+                        n: info.name,
+                        m: info.minutes,
+                        c: CategoryClassifier.classify(bundleID: bundleID).rawValue
+                    )
+                }
+            )
+        }.sorted { $0.date < $1.date }
+
+        // Persist for the host app to read back.
+        if let url = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.app.spent"
+        ) {
+            if let encoded = try? JSONEncoder().encode(result) {
+                try? encoded.write(
+                    to: url.appendingPathComponent("backfill.json"),
+                    options: .atomicWrite
+                )
+            }
+        }
+        UserDefaults(suiteName: "group.app.spent")?
+            .set(Date.now.timeIntervalSince1970, forKey: "spent.backfill.ts")
+
+        return result
+    }
+}
+
+struct BackfillSummaryView: View {
+    let days: [BackfillDay]
+    var body: some View {
+        Text("Imported \(days.count) days")
+            .font(.system(size: 11, weight: .heavy, design: .monospaced))
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.blue)
+    }
+}
+
 // MARK: - Local type mirrors
 // These must match the Codable layout of the identically-named types in the main app target.
 

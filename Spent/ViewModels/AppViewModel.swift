@@ -26,9 +26,15 @@ final class AppViewModel {
     private var intervalEndObserver: Timer?
     private var isInitializing = false
 
+    // Observable mirror of the persisted tracked-app count so SwiftUI re-renders
+    // (e.g. RootView switching away from AppSelectionView) when apps are saved.
+    var trackedAppCount: Int = UserDefaults(suiteName: "group.app.spent")?.integer(forKey: "spent.apps.count") ?? 0
+
     // True when the user hasn't selected any apps to track yet.
-    var needsAppSetup: Bool {
-        (UserDefaults(suiteName: "group.app.spent")?.integer(forKey: "spent.apps.count") ?? 0) == 0
+    var needsAppSetup: Bool { trackedAppCount == 0 }
+
+    func refreshTrackedAppCount() {
+        trackedAppCount = UserDefaults(suiteName: "group.app.spent")?.integer(forKey: "spent.apps.count") ?? 0
     }
 
     func initialize() async {
@@ -41,6 +47,7 @@ final class AppViewModel {
                 updateSettings { $0.trialStartDate = Date.now }
             }
             streak = await cloudKit.fetchStreak()
+            loadHistory()
             await loadTodayReceipt()
             startLiveUpdates()
         }
@@ -62,7 +69,62 @@ final class AppViewModel {
 
     // Called after the user saves a new app selection so the receipt updates.
     func reloadTrackedApps() {
+        refreshTrackedAppCount()
         Task { await loadTodayReceipt() }
+    }
+
+    // MARK: - History (backfill)
+
+    private static let historyKey = "spent.history"
+
+    func loadHistory() {
+        guard let data = UserDefaults(suiteName: "group.app.spent")?.data(forKey: Self.historyKey),
+              let history = try? JSONDecoder().decode([DailyReceipt].self, from: data) else { return }
+        receiptHistory = history.sorted { $0.date > $1.date }
+    }
+
+    private func saveHistory() {
+        guard let data = try? JSONEncoder().encode(receiptHistory) else { return }
+        UserDefaults(suiteName: "group.app.spent")?.set(data, forKey: Self.historyKey)
+    }
+
+    private func receipt(from day: BackfillDay) -> DailyReceipt {
+        let apps = day.apps.map { a in
+            AppUsage(
+                id: UUID(),
+                bundleID: a.b,
+                displayName: a.n,
+                minutes: a.m,
+                category: AppCategory(rawValue: a.c) ?? .neutral
+            )
+        }
+        return DailyReceipt(
+            id: UUID(),
+            date: Date(timeIntervalSince1970: day.date),
+            apps: apps,
+            hourlyRate: settings.hourlyRate,
+            mode: settings.userMode
+        )
+    }
+
+    /// Reads the data the report extension wrote and merges it into history,
+    /// one receipt per day. Returns the number of days imported.
+    @discardableResult
+    func importBackfill() -> Int {
+        guard let days = BackfillStore.loadDays() else { return 0 }
+        let imported = days.map { receipt(from: $0) }
+        guard !imported.isEmpty else { return 0 }
+
+        let cal = Calendar.current
+        func key(_ date: Date) -> Date { cal.startOfDay(for: date) }
+
+        var byDay: [Date: DailyReceipt] = [:]
+        for r in receiptHistory { byDay[key(r.date)] = r }
+        for r in imported { byDay[key(r.date)] = r } // imported wins
+
+        receiptHistory = byDay.values.sorted { $0.date > $1.date }
+        saveHistory()
+        return imported.count
     }
 
     func startLiveUpdates() {

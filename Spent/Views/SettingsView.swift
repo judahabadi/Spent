@@ -7,6 +7,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showDeleteConfirm = false
     @State private var showAppSelection = false
+    @State private var showBackfill = false
 
     var body: some View {
         NavigationStack {
@@ -120,7 +121,7 @@ struct SettingsView: View {
     }
 
     private var trackedAppsSection: some View {
-        let count = UserDefaults(suiteName: "group.app.spent")?.integer(forKey: "spent.apps.count") ?? 0
+        let count = appVM.trackedAppCount
         return Section("Tracked Apps") {
             HStack {
                 Text("Apps tracked")
@@ -210,6 +211,26 @@ struct SettingsView: View {
                 Spacer()
                 Text(appCount > 0 ? "\(appCount)" : "—")
                     .foregroundStyle(.secondary)
+            }
+            NavigationLink {
+                HistoryListView()
+            } label: {
+                HStack {
+                    Text("History")
+                    Spacer()
+                    Text(appVM.receiptHistory.isEmpty ? "—" : "\(appVM.receiptHistory.count) days")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Button {
+                showBackfill = true
+            } label: {
+                Text("Import last 30 days")
+                    .foregroundStyle(.primary)
+            }
+            .disabled(appVM.trackedAppCount == 0)
+            .sheet(isPresented: $showBackfill) {
+                BackfillView()
             }
         }
     }
