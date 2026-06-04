@@ -19,6 +19,7 @@
 		AA00000B000000000000001B /* StoreKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000B000000000000001A /* StoreKitService.swift */; };
 		AA00000C000000000000001B /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000C000000000000001A /* NotificationService.swift */; };
 		AA00000D000000000000001B /* ReceiptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000D000000000000001A /* ReceiptView.swift */; };
+		AA000099000000000000001B /* AppSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000099000000000000001A /* AppSelectionView.swift */; };
 		AA00000E000000000000001B /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000E000000000000001A /* OnboardingView.swift */; };
 		AA00000F000000000000001B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000F000000000000001A /* SettingsView.swift */; };
 		AA000010000000000000001B /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000010000000000000001A /* PaywallView.swift */; };
@@ -106,6 +107,7 @@
 		AA00000B000000000000001A /* StoreKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitService.swift; sourceTree = "<group>"; };
 		AA00000C000000000000001A /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		AA00000D000000000000001A /* ReceiptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptView.swift; sourceTree = "<group>"; };
+		AA000099000000000000001A /* AppSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSelectionView.swift; sourceTree = "<group>"; };
 		AA00000E000000000000001A /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		AA00000F000000000000001A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AA000010000000000000001A /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
@@ -248,6 +250,7 @@
 			isa = PBXGroup;
 			children = (
 				AA00000D000000000000001A /* ReceiptView.swift */,
+				AA000099000000000000001A /* AppSelectionView.swift */,
 				AA00000E000000000000001A /* OnboardingView.swift */,
 				AA00000F000000000000001A /* SettingsView.swift */,
 				AA000010000000000000001A /* PaywallView.swift */,
@@ -619,6 +622,7 @@
 				AA00000B000000000000001B /* StoreKitService.swift in Sources */,
 				AA00000C000000000000001B /* NotificationService.swift in Sources */,
 				AA00000D000000000000001B /* ReceiptView.swift in Sources */,
+				AA000099000000000000001B /* AppSelectionView.swift in Sources */,
 				AA00000E000000000000001B /* OnboardingView.swift in Sources */,
 				AA00000F000000000000001B /* SettingsView.swift in Sources */,
 				AA000010000000000000001B /* PaywallView.swift in Sources */,
