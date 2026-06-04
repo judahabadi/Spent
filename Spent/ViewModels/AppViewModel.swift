@@ -20,8 +20,9 @@ final class AppViewModel {
     var receiptHistory: [DailyReceipt] = []
     var reportRefreshID = UUID()
 
-    // Live update timer
+    // Live update timer + interval-end observer
     private var updateTimer: Timer?
+    private var intervalEndObserver: Timer?
     private var isInitializing = false
 
     func initialize() async {
@@ -67,11 +68,29 @@ final class AppViewModel {
 
     func startLiveUpdates() {
         updateTimer?.invalidate()
-        updateTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+        // Refresh the DeviceActivityReport view every 60 s so the extension has
+        // a fresh render target to write into.
+        updateTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 self.reportRefreshID = UUID()
-                try? await Task.sleep(for: .seconds(8))
+                try? await Task.sleep(for: .seconds(10))
+                await self.loadTodayReceipt()
+            }
+        }
+
+        // Also trigger immediately when SpentActivityMonitor signals interval end.
+        // That signal proves data is now available, so we refresh right away.
+        intervalEndObserver?.invalidate()
+        var lastKnownEnd = UserDefaults(suiteName: "group.app.spent")?.object(forKey: "lastIntervalEnd") as? Date
+        intervalEndObserver = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+            let current = UserDefaults(suiteName: "group.app.spent")?.object(forKey: "lastIntervalEnd") as? Date
+            guard current != lastKnownEnd else { return }
+            lastKnownEnd = current
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.reportRefreshID = UUID()
+                try? await Task.sleep(for: .seconds(10))
                 await self.loadTodayReceipt()
             }
         }

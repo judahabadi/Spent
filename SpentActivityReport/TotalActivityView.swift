@@ -24,11 +24,25 @@ struct TotalActivityReport: DeviceActivityReportScene {
     }
 
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> ReceiptConfiguration {
-        // Increment call counter so the main app can confirm this runs.
+        // Write proof-of-life BEFORE touching data so we know the process launched
+        // even if the async data iteration hangs or the app group is misconfigured.
         let ud = UserDefaults(suiteName: "group.app.spent")
         let n = (ud?.integer(forKey: "spent.diag.calls") ?? 0) + 1
         ud?.set(n, forKey: "spent.diag.calls")
         ud?.set(Date.now.timeIntervalSince1970, forKey: "spent.diag.ts")
+        ud?.synchronize()
+
+        // Also write a plain file so the main app can detect the extension ran
+        // even if UserDefaults cross-process sync is delayed.
+        if let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.app.spent"
+        ) {
+            let aliveData = "\(n)|\(Date.now.timeIntervalSince1970)".data(using: .utf8)
+            try? aliveData?.write(
+                to: containerURL.appendingPathComponent("ext-alive.txt"),
+                options: .atomicWrite
+            )
+        }
 
         var totals: [String: (displayName: String, minutes: Int)] = [:]
 
@@ -109,18 +123,16 @@ private struct SimpleApp: Codable {
 struct TotalActivityView: View {
     let configuration: TotalActivityReport.ReceiptConfiguration
 
-    private var containerStatus: String {
-        let url = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: "group.app.spent"
-        )
-        return url != nil ? "AG:OK" : "AG:NIL"
-    }
-
     var body: some View {
-        Text("\(containerStatus) \(configuration.appUsages.count)apps")
-            .font(.system(size: 10, weight: .bold, design: .monospaced))
-            .foregroundColor(containerStatus == "AG:OK" ? .green : .red)
+        let agOK = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.app.spent"
+        ) != nil
+        let status = "★ EXT RUNNING | AG:\(agOK ? "OK" : "NIL") | \(configuration.appUsages.count) apps ★"
+        return Text(status)
+            .font(.system(size: 13, weight: .heavy, design: .monospaced))
+            .foregroundColor(.white)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(agOK ? Color.green : Color.red)
     }
 }
 

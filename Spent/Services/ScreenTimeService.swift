@@ -33,34 +33,29 @@ final class ScreenTimeService {
         authorizationStatus = center.authorizationStatus
     }
 
-    // DeviceActivityReport only calls makeConfiguration after a monitoring interval
-    // COMPLETES. A daily schedule (00:00–23:59) won't complete until 23:59, so the
-    // extension never runs during the day. Hourly schedules complete every hour,
-    // triggering the extension throughout the day. Apple caps at 20 simultaneous
-    // activities, so we monitor hours 0–19 (midnight–8PM). Hours 20–23 are omitted
-    // but the report filter still aggregates the day's data correctly.
+    // Apple docs: "If you present the report in the middle of an active interval,
+    // the system calls the extension to provide a report of the activity that has
+    // occurred so far during that interval." A single daily schedule keeps one
+    // interval permanently active throughout the day, so the extension is called
+    // every time the DeviceActivityReport view renders — no need for 20 hourly
+    // schedules. Hourly schedules were tried in builds 73-76; the extension never
+    // invoked. Single daily schedule is simpler and matches Apple's sample code.
     func startMonitoring() {
-        // Stop any previous schedules (daily or hourly).
         let allNames = (0...23).map { DeviceActivityName.hour($0) } + [.daily]
         deviceActivityCenter.stopMonitoring(allNames)
 
-        var started = 0
-        var failed = 0
-        for hour in 0...19 {
-            let schedule = DeviceActivitySchedule(
-                intervalStart: DateComponents(hour: hour, minute: 0),
-                intervalEnd: DateComponents(hour: hour, minute: 59),
-                repeats: true
-            )
-            do {
-                try deviceActivityCenter.startMonitoring(.hour(hour), during: schedule)
-                started += 1
-            } catch {
-                failed += 1
-            }
-        }
+        let schedule = DeviceActivitySchedule(
+            intervalStart: DateComponents(hour: 0, minute: 0),
+            intervalEnd: DateComponents(hour: 23, minute: 59),
+            repeats: true
+        )
         let defaults = UserDefaults(suiteName: "group.app.spent")
-        defaults?.set("schedules started=\(started) failed=\(failed)", forKey: "spent.monitoring.diagnostics")
+        do {
+            try deviceActivityCenter.startMonitoring(.daily, during: schedule)
+            defaults?.set("daily started=1 failed=0", forKey: "spent.monitoring.diagnostics")
+        } catch {
+            defaults?.set("daily failed: \(error.localizedDescription)", forKey: "spent.monitoring.diagnostics")
+        }
         defaults?.set(Date.now.timeIntervalSince1970, forKey: "spent.monitoring.diagnostics.ts")
     }
 
@@ -72,7 +67,5 @@ final class ScreenTimeService {
 
 extension DeviceActivityName {
     static let daily = DeviceActivityName("daily")
-    static func hour(_ h: Int) -> DeviceActivityName {
-        DeviceActivityName("hour-\(String(format: "%02d", h))")
-    }
+    static func hour(_ h: Int) -> DeviceActivityName { DeviceActivityName("hour-\(String(format: "%02d", h))") }
 }

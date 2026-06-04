@@ -1,5 +1,6 @@
 import SwiftUI
 import LocalAuthentication
+import FamilyControls
 
 struct SettingsView: View {
     @Environment(AppViewModel.self) private var appVM
@@ -204,7 +205,136 @@ struct SettingsView: View {
         let fileSize = attrs?[.size] as? Int ?? -1
         let fileStatus = fileSize >= 0 ? "\(fileSize) bytes" : "missing"
 
+        // ext-alive.txt is written at the TOP of makeConfiguration (before data iteration)
+        // so its presence proves the extension process launched even if the app group fails.
+        let aliveURL = containerURL?.appendingPathComponent("ext-alive.txt")
+        let aliveContent = aliveURL.flatMap { try? String(contentsOf: $0, encoding: .utf8) }
+        let aliveStatus: String = {
+            guard let s = aliveContent, let pipe = s.firstIndex(of: "|") else { return "never" }
+            let tsVal = Double(s[s.startIndex..<pipe]) ?? 0
+            guard tsVal > 0 else { return "never" }
+            return Date(timeIntervalSince1970: tsVal).formatted(.dateTime.hour().minute().second())
+        }()
+
+        // Check where the extension binary actually landed in the app bundle.
+        let fm = FileManager.default
+        let bundlePath = Bundle.main.bundlePath
+        let inPlugIns = fm.fileExists(atPath: bundlePath + "/PlugIns/SpentActivityReport.appex")
+        let inExtensions = fm.fileExists(atPath: bundlePath + "/Extensions/SpentActivityReport.appex")
+        let extLocation = inExtensions ? "Extensions/ ✓" : (inPlugIns ? "PlugIns/ ✗" : "NOT FOUND ✗")
+
+        // FamilyControls authorization status
+        let authStatus: String = {
+            switch appVM.screenTime.authorizationStatus {
+            case .approved: return "approved ✓"
+            case .denied: return "denied ✗"
+            case .notDetermined: return "not determined"
+            @unknown default: return "unknown"
+            }
+        }()
+        let authOK = appVM.screenTime.authorizationStatus == .approved
+
+        // Monitoring schedule diagnostic written by startMonitoring()
+        let monDiag = ud?.string(forKey: "spent.monitoring.diagnostics") ?? "not started"
+        let monOK = monDiag.contains("started=1") || monDiag.contains("started=20")
+
+        // Extension process init timestamp — written in SpentActivityReportExtension.init()
+        // BEFORE makeConfiguration. Shows "never" if extension process never launches.
+        let extInitTs = ud?.double(forKey: "spent.diag.ext.init") ?? 0
+        let extInitStatus = extInitTs > 0
+            ? Date(timeIntervalSince1970: extInitTs).formatted(.dateTime.hour().minute().second())
+            : "never"
+
+        // Read the extension's embedded provisioning profile to check what entitlements
+        // are actually granted in the signed binary (family-controls + app group required).
+        let extBundlePath = Bundle.main.bundlePath + "/Extensions/SpentActivityReport.appex"
+        let provPath = extBundlePath + "/embedded.mobileprovision"
+        let provData = FileManager.default.contents(atPath: provPath)
+        let provStr = provData.flatMap { String(bytes: $0, encoding: .ascii) } ?? ""
+        let provHasFC = provStr.contains("family-controls")
+        let provHasAG = provStr.contains("group.app.spent")
+        let provExists = provData != nil
+        let provStatus: String = {
+            if !provExists { return "no profile (dev build?)" }
+            return "FC:\(provHasFC ? "✓" : "✗") AG:\(provHasAG ? "✓" : "✗")"
+        }()
+        let provOK = provHasFC && provHasAG
+
+        // LAUNCH-FAILURE PROBES — these target WHY the extension process never
+        // starts (init never fires). A report extension is launched by the OS
+        // only if (a) the shipped bundle is structurally valid, (b) it is signed,
+        // and (c) the DeviceActivityReport view is laid out with a non-zero size.
+        let fmp = FileManager.default
+
+        // (a) Shipped bundle structure: read the Info.plist the OS actually sees
+        // (not our source plist) plus confirm the executable is present.
+        let extBundle = Bundle(path: extBundlePath)
+        let shippedPointID = (extBundle?.infoDictionary?["EXAppExtensionAttributes"] as? [String: Any])?["EXExtensionPointIdentifier"] as? String
+        let pointIDStatus: String = {
+            guard let id = shippedPointID else { return "MISSING ✗" }
+            return id == "com.apple.deviceactivityui.report-extension" ? "report ✓" : id
+        }()
+        let pointIDOK = shippedPointID == "com.apple.deviceactivityui.report-extension"
+
+        let exePresent = fmp.fileExists(atPath: extBundlePath + "/SpentActivityReport")
+
+        // (b) Code signature directory must exist for the OS to launch the appex.
+        let sigPresent = fmp.fileExists(atPath: extBundlePath + "/_CodeSignature")
+        let bundleStatus = "exe:\(exePresent ? "✓" : "✗") sig:\(sigPresent ? "✓" : "✗")"
+        let bundleOK = exePresent && sigPresent
+
+        // (c) Rendered size of the DeviceActivityReport view, captured live in
+        // ReceiptView. "0x0" or "—" means the view never got a real layout, which
+        // silently prevents the OS from launching the extension.
+        let reportSize = ud?.string(forKey: "spent.diag.report.size") ?? "—"
+        let sizeOK = !(reportSize == "—" || reportSize.hasPrefix("0x") || reportSize.hasSuffix("x0"))
+
         return Section("Diagnostics") {
+            HStack {
+                Text("Auth status")
+                Spacer()
+                Text(authStatus).foregroundStyle(authOK ? .green : .red)
+            }
+            HStack {
+                Text("Monitoring")
+                Spacer()
+                Text(monDiag).foregroundStyle(monOK ? .green : .orange)
+            }
+            HStack {
+                Text("Extension location")
+                Spacer()
+                Text(extLocation).foregroundStyle(inExtensions ? .green : .red)
+            }
+            HStack {
+                Text("Ext provisioning")
+                Spacer()
+                Text(provStatus).foregroundStyle(provOK ? .green : .red)
+            }
+            HStack {
+                Text("Ext point id")
+                Spacer()
+                Text(pointIDStatus).foregroundStyle(pointIDOK ? .green : .red)
+            }
+            HStack {
+                Text("Ext bundle")
+                Spacer()
+                Text(bundleStatus).foregroundStyle(bundleOK ? .green : .red)
+            }
+            HStack {
+                Text("Report view size")
+                Spacer()
+                Text(reportSize).foregroundStyle(sizeOK ? .green : .red)
+            }
+            HStack {
+                Text("Ext process init")
+                Spacer()
+                Text(extInitStatus).foregroundStyle(extInitStatus == "never" ? .red : .green)
+            }
+            HStack {
+                Text("Ext process alive")
+                Spacer()
+                Text(aliveStatus).foregroundStyle(aliveStatus == "never" ? .red : .green)
+            }
             HStack {
                 Text("makeConfig calls")
                 Spacer()
