@@ -99,11 +99,12 @@ struct BackfillView: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
 
-            // Drives the extension. Must be laid out non-zero; kept faint + inert.
+            // Drives the extension. A DeviceActivityReport only launches its
+            // extension while genuinely visible and laid out, so render it at a
+            // real, on-screen size rather than hiding it.
             BackfillReportView(tokens: tokens)
-                .frame(height: 120)
-                .opacity(0.02)
-                .allowsHitTesting(false)
+                .frame(maxWidth: .infinity, minHeight: 200)
+                .clipped()
         }
         .padding(32)
         .fontDesign(.monospaced)
@@ -121,9 +122,9 @@ struct BackfillView: View {
             elapsed += 1
             if BackfillStore.lastWriteTimestamp > baseline {
                 finish()
-            } else if elapsed >= 15 {
+            } else if elapsed >= 25 {
                 timer?.invalidate()
-                status = "Couldn't read history. Screen Time may have no data for these apps, or the report extension didn't run."
+                status = "Couldn't read history. The Screen Time report extension didn't run, or there's no data for these apps."
             }
         }
     }
