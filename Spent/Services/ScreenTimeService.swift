@@ -33,34 +33,63 @@ final class ScreenTimeService {
         authorizationStatus = center.authorizationStatus
     }
 
-    // Apple docs: "If you present the report in the middle of an active interval,
-    // the system calls the extension to provide a report of the activity that has
-    // occurred so far during that interval." A single daily schedule keeps one
-    // interval permanently active throughout the day, so the extension is called
-    // every time the DeviceActivityReport view renders — no need for 20 hourly
-    // schedules. Hourly schedules were tried in builds 73-76; the extension never
-    // invoked. Single daily schedule is simpler and matches Apple's sample code.
-    func startMonitoring() {
-        let allNames = (0...23).map { DeviceActivityName.hour($0) } + [.daily]
-        deviceActivityCenter.stopMonitoring(allNames)
+    // Called once after the user selects apps via FamilyActivityPicker.
+    // Creates one DeviceActivityName per group of appsPerGroup apps, each with
+    // threshold events at every milestone minute. SpentActivityMonitor records
+    // the highest threshold reached per app — that becomes the minute count.
+    func setupAppTracking(selection: FamilyActivitySelection, names: [String]) {
+        let tokens = Array(selection.applicationTokens)
+        guard !tokens.isEmpty else { return }
+        let defaults = UserDefaults(suiteName: "group.app.spent")
 
+        // Persist tokens and user-assigned display names.
+        if let data = try? JSONEncoder().encode(tokens) {
+            defaults?.set(data, forKey: "spent.apps.tokens")
+        }
+        if let data = try? JSONEncoder().encode(names) {
+            defaults?.set(data, forKey: "spent.apps.names")
+        }
+        defaults?.set(tokens.count, forKey: "spent.apps.count")
+
+        // Stop any existing tracking activities.
+        let old = (0..<5).map { DeviceActivityName("tracking-\($0)") }
+        deviceActivityCenter.stopMonitoring(old)
+
+        // Minute thresholds: gives ≤12 events per app, 48 per group (under limit).
+        let thresholds = [1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120]
+        let groupSize = 4
         let schedule = DeviceActivitySchedule(
             intervalStart: DateComponents(hour: 0, minute: 0),
             intervalEnd: DateComponents(hour: 23, minute: 59),
             repeats: true
         )
-        let defaults = UserDefaults(suiteName: "group.app.spent")
-        do {
-            try deviceActivityCenter.startMonitoring(.daily, during: schedule)
-            defaults?.set("daily started=1 failed=0", forKey: "spent.monitoring.diagnostics")
-        } catch {
-            defaults?.set("daily failed: \(error.localizedDescription)", forKey: "spent.monitoring.diagnostics")
+
+        var started = 0
+        for groupStart in stride(from: 0, to: tokens.count, by: groupSize) {
+            let groupIndex = groupStart / groupSize
+            var events: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
+            for offset in 0..<groupSize {
+                let appIndex = groupStart + offset
+                guard appIndex < tokens.count else { break }
+                for minutes in thresholds {
+                    events[DeviceActivityEvent.Name("app\(appIndex)-\(minutes)")] = DeviceActivityEvent(
+                        applications: [tokens[appIndex]],
+                        threshold: DateComponents(minute: minutes)
+                    )
+                }
+            }
+            let name = DeviceActivityName("tracking-\(groupIndex)")
+            if (try? deviceActivityCenter.startMonitoring(name, during: schedule, events: events)) != nil {
+                started += 1
+            }
         }
+        defaults?.set("tracking started=\(started)", forKey: "spent.monitoring.diagnostics")
         defaults?.set(Date.now.timeIntervalSince1970, forKey: "spent.monitoring.diagnostics.ts")
     }
 
     func stopMonitoring() {
-        let names = (0...23).map { DeviceActivityName.hour($0) } + [.daily]
+        let names = (0...4).map { DeviceActivityName("tracking-\($0)") } + [.daily]
+            + (0...23).map { DeviceActivityName.hour($0) }
         deviceActivityCenter.stopMonitoring(names)
     }
 }

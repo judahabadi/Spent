@@ -17,6 +17,7 @@ final class AppViewModel {
     var streak: StreakRecord = .empty
     var isShowingSettings = false
     var isShowingPaywall = false
+    var isShowingAppSelection = false
     var receiptHistory: [DailyReceipt] = []
     var reportRefreshID = UUID()
 
@@ -24,6 +25,11 @@ final class AppViewModel {
     private var updateTimer: Timer?
     private var intervalEndObserver: Timer?
     private var isInitializing = false
+
+    // True when the user hasn't selected any apps to track yet.
+    var needsAppSetup: Bool {
+        (UserDefaults(suiteName: "group.app.spent")?.integer(forKey: "spent.apps.count") ?? 0) == 0
+    }
 
     func initialize() async {
         guard !isInitializing else { return }
@@ -34,19 +40,9 @@ final class AppViewModel {
             if settings.trialStartDate == nil {
                 updateSettings { $0.trialStartDate = Date.now }
             }
-            screenTime.startMonitoring()
             streak = await cloudKit.fetchStreak()
             await loadTodayReceipt()
             startLiveUpdates()
-            // DeviceActivityReport triggers the extension asynchronously after the view renders.
-            // Poll until data arrives rather than waiting the full timer interval.
-            Task {
-                for delay: Double in [4, 10, 20] {
-                    try? await Task.sleep(for: .seconds(delay))
-                    await loadTodayReceipt()
-                    if !self.todayReceipt.apps.isEmpty { break }
-                }
-            }
         }
     }
 
@@ -58,40 +54,34 @@ final class AppViewModel {
     }
 
     func loadTodayReceipt() async {
-        // In production: read from DeviceActivity report extension shared container
-        // Here: build from cached shared UserDefaults suite
-        let cached = SharedDataStore.loadTodayReceipt()
+        let receipt = ThresholdDataStore.loadTodayReceipt(settings: settings)
         await MainActor.run {
-            self.todayReceipt = cached ?? .empty(date: .now, hourlyRate: settings.hourlyRate, mode: settings.userMode)
+            self.todayReceipt = receipt ?? .empty(date: .now, hourlyRate: settings.hourlyRate, mode: settings.userMode)
         }
+    }
+
+    // Called after the user saves a new app selection so the receipt updates.
+    func reloadTrackedApps() {
+        Task { await loadTodayReceipt() }
     }
 
     func startLiveUpdates() {
         updateTimer?.invalidate()
-        // Refresh the DeviceActivityReport view every 60 s so the extension has
-        // a fresh render target to write into.
-        updateTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+        updateTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in
-                guard let self else { return }
-                self.reportRefreshID = UUID()
-                try? await Task.sleep(for: .seconds(10))
-                await self.loadTodayReceipt()
+                await self?.loadTodayReceipt()
             }
         }
 
-        // Also trigger immediately when SpentActivityMonitor signals interval end.
-        // That signal proves data is now available, so we refresh right away.
+        // Also reload immediately when SpentActivityMonitor writes a new threshold.
         intervalEndObserver?.invalidate()
-        var lastKnownEnd = UserDefaults(suiteName: "group.app.spent")?.object(forKey: "lastIntervalEnd") as? Date
+        var lastKnownTs = UserDefaults(suiteName: "group.app.spent")?.double(forKey: "spent.threshold.ts") ?? 0
         intervalEndObserver = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
-            let current = UserDefaults(suiteName: "group.app.spent")?.object(forKey: "lastIntervalEnd") as? Date
-            guard current != lastKnownEnd else { return }
-            lastKnownEnd = current
+            let ts = UserDefaults(suiteName: "group.app.spent")?.double(forKey: "spent.threshold.ts") ?? 0
+            guard ts != lastKnownTs else { return }
+            lastKnownTs = ts
             Task { @MainActor [weak self] in
-                guard let self else { return }
-                self.reportRefreshID = UUID()
-                try? await Task.sleep(for: .seconds(10))
-                await self.loadTodayReceipt()
+                await self?.loadTodayReceipt()
             }
         }
     }
@@ -200,45 +190,40 @@ struct SpentSettings: Codable {
     }
 }
 
-// Shared data store for app group communication with extensions
-struct SharedDataStore {
+// Reads threshold data written by SpentActivityMonitor to build today's receipt.
+struct ThresholdDataStore {
     private static let groupID = "group.app.spent"
 
-    static func loadTodayReceipt() -> DailyReceipt? {
-        guard let containerURL = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: groupID
-        ) else { return nil }
+    static func loadTodayReceipt(settings: SpentSettings) -> DailyReceipt? {
+        let defaults = UserDefaults(suiteName: groupID)
+        let count = defaults?.integer(forKey: "spent.apps.count") ?? 0
+        guard count > 0 else { return nil }
 
-        // Primary: simple flat format — pure primitives, cannot have Codable decode issues.
-        let simpleURL = containerURL.appendingPathComponent("apps-simple.json")
-        if let data = try? Data(contentsOf: simpleURL) {
-            struct SimpleApp: Codable { var b: String; var n: String; var m: Int; var c: String }
-            if let simpleApps = try? JSONDecoder().decode([SimpleApp].self, from: data),
-               !simpleApps.isEmpty {
-                let settings = SpentSettings.load()
-                let apps = simpleApps.map { app in
-                    AppUsage(
-                        id: UUID(),
-                        bundleID: app.b,
-                        displayName: app.n,
-                        minutes: app.m,
-                        category: AppCategory(rawValue: app.c) ?? .neutral
-                    )
-                }
-                return DailyReceipt(
-                    id: UUID(), date: .now, apps: apps,
-                    hourlyRate: settings.hourlyRate, mode: settings.userMode
-                )
+        // Decode stored names.
+        var names: [String] = (0..<count).map { "App \($0 + 1)" }
+        if let data = defaults?.data(forKey: "spent.apps.names"),
+           let stored = try? JSONDecoder().decode([String].self, from: data) {
+            for (i, n) in stored.enumerated() where i < count {
+                names[i] = n.isEmpty ? "App \(i + 1)" : n
             }
         }
 
-        // Fallback: full receipt JSON.
-        let fileURL = containerURL.appendingPathComponent("today.receipt")
-        if let data = try? Data(contentsOf: fileURL),
-           let receipt = try? JSONDecoder().decode(DailyReceipt.self, from: data) {
-            return receipt
+        // Build AppUsage entries from threshold values.
+        let apps: [AppUsage] = (0..<count).compactMap { i in
+            let minutes = defaults?.integer(forKey: "spent.threshold.app\(i)") ?? 0
+            guard minutes > 0 else { return nil }
+            return AppUsage(
+                id: UUID(),
+                bundleID: "tracked.\(i)",
+                displayName: names[i],
+                minutes: minutes,
+                category: .spent
+            )
         }
 
-        return nil
+        return DailyReceipt(
+            id: UUID(), date: .now, apps: apps,
+            hourlyRate: settings.hourlyRate, mode: settings.userMode
+        )
     }
 }

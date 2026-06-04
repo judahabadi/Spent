@@ -31,6 +31,8 @@ struct RootView: View {
                 OnboardingView()
             } else if appVM.screenTime.authorizationStatus == .notDetermined || appVM.screenTime.authorizationStatus == .denied {
                 PermissionDeniedView()
+            } else if appVM.needsAppSetup {
+                AppSelectionView()
             } else {
                 ReceiptView()
             }

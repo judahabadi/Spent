@@ -1,16 +1,8 @@
 import SwiftUI
-import DeviceActivity
 
 struct ReceiptView: View {
     @Environment(AppViewModel.self) private var appVM
     @State private var showCalendar = false
-
-    private var todayFilter: DeviceActivityFilter {
-        let start = Calendar.current.startOfDay(for: .now)
-        return DeviceActivityFilter(
-            segment: .daily(during: DateInterval(start: start, end: .now))
-        )
-    }
 
     var body: some View {
         ZStack {
@@ -40,25 +32,6 @@ struct ReceiptView: View {
     private var receiptPane: some View {
         VStack(spacing: 0) {
             headerBar
-            // Outside ScrollView so it is always in the viewport. .id() forces
-            // a new view when reportRefreshID changes, giving the extension a
-            // fresh render request. Daily filter matches the daily monitoring
-            // schedule; per Apple docs, extension is called mid-interval.
-            DeviceActivityReport(.init("totalActivity"), filter: todayFilter)
-                .id(appVM.reportRefreshID)
-                .frame(height: 40)
-                .background(
-                    // Diagnostic: record the actual laid-out size. A 0×0 frame
-                    // silently prevents the OS from launching the report extension.
-                    GeometryReader { geo in
-                        Color.clear.onAppear {
-                            UserDefaults(suiteName: "group.app.spent")?.set(
-                                "\(Int(geo.size.width))x\(Int(geo.size.height))",
-                                forKey: "spent.diag.report.size"
-                            )
-                        }
-                    }
-                )
             ScrollView {
                 VStack(spacing: 0) {
                     periodToggle
@@ -72,6 +45,14 @@ struct ReceiptView: View {
 
     private var headerBar: some View {
         HStack {
+            Button {
+                appVM.isShowingAppSelection = true
+            } label: {
+                Image(systemName: "plus.circle")
+                    .font(.system(size: 20, weight: .regular))
+                    .foregroundStyle(.primary)
+            }
+            .padding(.leading, 20)
             Spacer()
             Button {
                 appVM.isShowingSettings = true
@@ -83,6 +64,9 @@ struct ReceiptView: View {
             .padding(.trailing, 20)
         }
         .frame(height: 50)
+        .sheet(isPresented: Bindable(appVM).isShowingAppSelection) {
+            AppSelectionView()
+        }
     }
 
     private var periodToggle: some View {
