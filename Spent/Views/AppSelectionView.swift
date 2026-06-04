@@ -5,7 +5,9 @@ struct AppSelectionView: View {
     @Environment(AppViewModel.self) private var appVM
     @Environment(\.dismiss) private var dismiss
 
-    @State private var selection = FamilyActivitySelection()
+    // Start from the currently tracked selection so reopening the picker shows
+    // existing apps as selected (otherwise saving would drop them).
+    @State private var selection = TrackedAppTokens.savedSelection()
     @State private var isLoading = false
 
     // Spent tracks individual apps via per-app thresholds, so we need actual app

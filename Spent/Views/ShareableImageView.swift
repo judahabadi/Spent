@@ -166,6 +166,15 @@ enum TrackedAppTokens {
         return tokens
     }
 
+    /// The persisted picker selection, so reopening the picker pre-selects current apps.
+    static func savedSelection() -> FamilyActivitySelection {
+        guard let data = UserDefaults(suiteName: suite)?.data(forKey: "spent.apps.selection"),
+              let selection = try? JSONDecoder().decode(FamilyActivitySelection.self, from: data) else {
+            return FamilyActivitySelection()
+        }
+        return selection
+    }
+
     /// Tracked apps store their index in `bundleID` as "tracked.<i>".
     static func token(for app: AppUsage) -> ApplicationToken? {
         let prefix = "tracked."
