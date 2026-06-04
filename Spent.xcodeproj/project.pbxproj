@@ -53,6 +53,7 @@
 		AA000060000000000000001B /* SpentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000060000000000000001A /* SpentUITests.swift */; };
 		AA00002D000000000000001C /* SpentWidgets.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA00002D000000000000001A /* SpentWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AA00003D000000000000001C /* SpentActivityReport.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA00003D000000000000001A /* SpentActivityReport.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AA00003D000000000000001D /* SpentActivityReport.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = AA00003D000000000000001A /* SpentActivityReport.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AA00004D000000000000001C /* SpentActivityMonitor.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA00004D000000000000001A /* SpentActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -376,7 +377,6 @@
 			dstSubfolderSpec = 13;
 			files = (
 				AA00002D000000000000001C /* SpentWidgets.appex in Embed App Extensions */,
-				AA00003D000000000000001C /* SpentActivityReport.appex in Embed App Extensions */,
 				AA00004D000000000000001C /* SpentActivityMonitor.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
@@ -388,6 +388,7 @@
 			dstPath = "Extensions";
 			dstSubfolderSpec = 1;
 			files = (
+				AA00003D000000000000001D /* SpentActivityReport.appex in Embed ExtensionKit Extensions */,
 			);
 			name = "Embed ExtensionKit Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -449,7 +450,7 @@
 			name = SpentActivityReport;
 			productName = SpentActivityReport;
 			productReference = AA00003D000000000000001A /* SpentActivityReport.appex */;
-			productType = "com.apple.product-type.app-extension";
+			productType = "com.apple.product-type.extensionkit-extension";
 		};
 		AA00004D000000000000AAAA /* SpentActivityMonitor */ = {
 			isa = PBXNativeTarget;
