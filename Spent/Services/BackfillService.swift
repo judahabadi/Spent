@@ -76,8 +76,10 @@ struct BackfillView: View {
     @Environment(AppViewModel.self) private var appVM
     @Environment(\.dismiss) private var dismiss
 
+    private enum Phase { case loading, done, failed }
+
     @State private var status = "Reading the last 30 days…"
-    @State private var done = false
+    @State private var phase: Phase = .loading
     @State private var baseline = BackfillStore.lastWriteTimestamp
     @State private var elapsed = 0
     @State private var timer: Timer?
@@ -86,12 +88,17 @@ struct BackfillView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            if done {
+            switch phase {
+            case .loading:
+                ProgressView()
+            case .done:
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 40))
                     .foregroundStyle(.green)
-            } else {
-                ProgressView()
+            case .failed:
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 40))
+                    .foregroundStyle(.orange)
             }
 
             Text(status)
@@ -101,10 +108,18 @@ struct BackfillView: View {
 
             // Drives the extension. A DeviceActivityReport only launches its
             // extension while genuinely visible and laid out, so render it at a
-            // real, on-screen size rather than hiding it.
-            BackfillReportView(tokens: tokens)
-                .frame(maxWidth: .infinity, minHeight: 200)
-                .clipped()
+            // real, on-screen size rather than hiding it. Only while loading.
+            if phase == .loading {
+                BackfillReportView(tokens: tokens)
+                    .frame(maxWidth: .infinity, minHeight: 200)
+                    .clipped()
+            }
+
+            Button(phase == .loading ? "Cancel" : "Close") {
+                timer?.invalidate()
+                dismiss()
+            }
+            .font(.system(size: 14, weight: .semibold, design: .monospaced))
         }
         .padding(32)
         .fontDesign(.monospaced)
@@ -115,7 +130,7 @@ struct BackfillView: View {
     private func startPolling() {
         guard !tokens.isEmpty else {
             status = "No tracked apps to import."
-            done = true
+            phase = .failed
             return
         }
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
@@ -125,6 +140,7 @@ struct BackfillView: View {
             } else if elapsed >= 25 {
                 timer?.invalidate()
                 status = "Couldn't read history. The Screen Time report extension didn't run, or there's no data for these apps."
+                phase = .failed
             }
         }
     }
@@ -135,7 +151,7 @@ struct BackfillView: View {
         status = count > 0
             ? "Imported \(count) day\(count == 1 ? "" : "s") of history."
             : "No historical usage found for these apps."
-        done = true
+        phase = .done
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { dismiss() }
     }
 }

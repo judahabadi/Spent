@@ -74,6 +74,11 @@ final class ScreenTimeService {
         }
         defaults?.set(tokens.count, forKey: "spent.apps.count")
 
+        // Persist the full selection so reopening the picker pre-selects current apps.
+        if let data = try? JSONEncoder().encode(selection) {
+            defaults?.set(data, forKey: "spent.apps.selection")
+        }
+
         // Re-write preserved minutes at each app's (possibly new) index; clear
         // counters for indices with no carried-over value, and any stale indices
         // beyond the new count.
