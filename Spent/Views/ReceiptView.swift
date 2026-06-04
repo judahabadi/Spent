@@ -150,7 +150,7 @@ struct ReceiptView: View {
 
     private func lineItem(app: AppUsage, isInvested: Bool) -> some View {
         HStack {
-            Text(app.displayName.uppercased())
+            AppLabel(app: app)
                 .font(.system(size: 11, design: .monospaced))
                 .lineLimit(1)
             Spacer()
@@ -179,7 +179,7 @@ struct ReceiptView: View {
 
     private func neutralLineItem(app: AppUsage) -> some View {
         HStack {
-            Text(app.displayName.uppercased())
+            AppLabel(app: app)
                 .font(.system(size: 11, design: .monospaced))
                 .lineLimit(1)
             Spacer()

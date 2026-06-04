@@ -16,13 +16,8 @@ struct CategorySettingsView: View {
 
             ForEach(apps) { app in
                 HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(app.displayName)
-                            .font(.system(size: 13, design: .monospaced))
-                        Text(app.bundleID)
-                            .font(.system(size: 10, design: .monospaced))
-                            .foregroundStyle(.secondary)
-                    }
+                    AppLabel(app: app, uppercasedFallback: false)
+                        .font(.system(size: 13, design: .monospaced))
                     Spacer()
                     Picker("", selection: Binding(
                         get: { classifier.overrides[app.bundleID] ?? classifier.classify(bundleID: app.bundleID, appleCategory: nil) },

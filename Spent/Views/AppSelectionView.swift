@@ -6,23 +6,26 @@ struct AppSelectionView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var selection = FamilyActivitySelection()
-    @State private var step = 0  // 0 = pick, 1 = name
-    @State private var names: [String] = []
     @State private var isLoading = false
+
+    // Spent tracks individual apps via per-app thresholds, so we need actual app
+    // selections. Apple's "All Apps & Categories" toggle yields category tokens
+    // with no application tokens, which we can't track — so require ≥1 app.
+    private var canSave: Bool { !selection.applicationTokens.isEmpty }
 
     var body: some View {
         NavigationStack {
-            if step == 0 {
-                pickerStep
-            } else {
-                namingStep
-            }
-        }
-        .fontDesign(.monospaced)
-    }
+            VStack(spacing: 0) {
+                FamilyActivityPicker(selection: $selection)
 
-    private var pickerStep: some View {
-        FamilyActivityPicker(selection: $selection)
+                if selection.applicationTokens.isEmpty && !selection.categoryTokens.isEmpty {
+                    Text("Pick individual apps rather than whole categories — Spent tracks each app separately.")
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                }
+            }
             .navigationTitle("Select Apps")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -31,54 +34,27 @@ struct AppSelectionView: View {
                         .font(.system(size: 14, design: .monospaced))
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Next") {
-                        let count = selection.applicationTokens.count
-                        names = (0..<count).map { "App \($0 + 1)" }
-                        step = 1
+                    if isLoading {
+                        ProgressView()
+                    } else {
+                        Button("Done") { save() }
+                            .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                            .disabled(!canSave)
                     }
-                    .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                    .disabled(selection.applicationTokens.isEmpty)
-                }
-            }
-    }
-
-    private var namingStep: some View {
-        List {
-            Section {
-                ForEach(names.indices, id: \.self) { i in
-                    TextField("App \(i + 1)", text: $names[i])
-                        .font(.system(size: 14, design: .monospaced))
-                }
-            } header: {
-                Text("Name each app you selected.\nYou can change these later in Settings.")
-                    .font(.system(size: 12, design: .monospaced))
-                    .textCase(nil)
-            }
-        }
-        .navigationTitle("Name Your Apps")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Back") { step = 0 }
-                    .font(.system(size: 14, design: .monospaced))
-            }
-            ToolbarItem(placement: .confirmationAction) {
-                if isLoading {
-                    ProgressView()
-                } else {
-                    Button("Done") { save() }
-                        .font(.system(size: 14, weight: .semibold, design: .monospaced))
                 }
             }
         }
+        .fontDesign(.monospaced)
     }
 
     private func save() {
         isLoading = true
-        let finalNames = names.map { $0.trimmingCharacters(in: .whitespaces) }
-            .enumerated()
-            .map { i, n in n.isEmpty ? "App \(i + 1)" : n }
-        appVM.screenTime.setupAppTracking(selection: selection, names: finalNames)
+        // Names are no longer entered by the user — the receipt renders each app's
+        // real name/icon via Label(token). These defaults are only a fallback for
+        // contexts where the token can't be rendered (e.g. exported images).
+        let count = selection.applicationTokens.count
+        let names = (0..<count).map { "App \($0 + 1)" }
+        appVM.screenTime.setupAppTracking(selection: selection, names: names)
         appVM.reloadTrackedApps()
         dismiss()
     }
