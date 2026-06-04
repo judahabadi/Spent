@@ -15,19 +15,42 @@ final class SpentDeviceActivityMonitor: DeviceActivityMonitor {
 
     // Fires at the start of each daily interval (midnight). Reset all threshold
     // counters so today's receipt starts from zero.
+    //
+    // IMPORTANT: iOS also calls this immediately when startMonitoring is invoked
+    // while the schedule window is already active (e.g. the user edits their app
+    // selection mid-day). Without a per-day guard, that would wipe today's
+    // counters every time apps are re-selected, zeroing the receipt. So only
+    // reset a group's counters the first time the interval starts on a given
+    // calendar day.
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)
         guard activity.rawValue.hasPrefix("tracking-") else { return }
         let groupIndex = Int(activity.rawValue.dropFirst("tracking-".count)) ?? 0
+
+        let today = Self.dayStamp(.now)
+        let guardKey = "spent.threshold.resetDay.\(activity.rawValue)"
+        if defaults?.string(forKey: guardKey) == today {
+            // Already reset this group today — this is a mid-day monitoring
+            // restart (app re-selection), not a new day. Preserve existing counts.
+            return
+        }
+
         let base = groupIndex * Self.appsPerGroup
         let count = defaults?.integer(forKey: "spent.apps.count") ?? 0
         for i in base..<min(base + Self.appsPerGroup, count) {
             defaults?.removeObject(forKey: "spent.threshold.app\(i)")
         }
+        defaults?.set(today, forKey: guardKey)
         defaults?.set(
             ISO8601DateFormatter().string(from: .now),
             forKey: "spent.threshold.resetDate"
         )
+    }
+
+    // Stable per-calendar-day key (yyyy-MM-dd) used to guard daily resets.
+    private static func dayStamp(_ date: Date) -> String {
+        let c = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        return String(format: "%04d-%02d-%02d", c.year ?? 0, c.month ?? 0, c.day ?? 0)
     }
 
     override func intervalDidEnd(for activity: DeviceActivityName) {
