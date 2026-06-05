@@ -299,15 +299,19 @@ struct ThresholdDataStore {
         // surfaced clutter: apps with 0 activity, apps the user deleted, and apps
         // that only exist on another device sharing the same iCloud account — all
         // of which have no local usage. Filtering by minutes > 0 hides all three.
+        let classifier = CategoryClassifier.load()
         let apps: [AppUsage] = (0..<count).compactMap { i in
             let minutes = defaults?.integer(forKey: "spent.threshold.app\(i)") ?? 0
             guard minutes > 0 else { return nil }
+            let bundleID = "tracked.\(i)"
             return AppUsage(
                 id: UUID(),
-                bundleID: "tracked.\(i)",
+                bundleID: bundleID,
                 displayName: names[i],
                 minutes: minutes,
-                category: .spent
+                // Individual authorization hides real bundle IDs/Apple categories,
+                // so default to Neutral and honor any per-app user override.
+                category: classifier.classify(bundleID: bundleID, appleCategory: nil)
             )
         }
 
