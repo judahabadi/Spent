@@ -295,10 +295,12 @@ struct ThresholdDataStore {
             }
         }
 
-        // Build AppUsage entries from threshold values.
-        let apps: [AppUsage] = (0..<count).compactMap { i in
+        // Build an AppUsage entry for EVERY tracked app, not just ones that have
+        // crossed the 1-minute threshold today. Otherwise lightly-used apps (and
+        // any not yet used today) silently disappear, leaving only heavy-usage
+        // social apps — making it look like only social apps were added.
+        let apps: [AppUsage] = (0..<count).map { i in
             let minutes = defaults?.integer(forKey: "spent.threshold.app\(i)") ?? 0
-            guard minutes > 0 else { return nil }
             return AppUsage(
                 id: UUID(),
                 bundleID: "tracked.\(i)",
