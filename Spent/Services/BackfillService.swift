@@ -19,6 +19,32 @@ struct BackfillApp: Codable {
 
 extension DeviceActivityReport.Context {
     static let backfill = Self("backfill")
+    static let totalActivity = Self("totalActivity")
+}
+
+// MARK: - Today report (always mounted in ReceiptView to keep the extension alive)
+
+/// Mounted permanently in the receipt so the extension process stays active and
+/// writes fresh usage data to apps-simple.json. Must have a non-zero layout size.
+struct TodayReportView: View {
+    let tokens: Set<ApplicationToken>
+    let refreshID: UUID
+
+    private var filter: DeviceActivityFilter {
+        let cal = Calendar.current
+        let start = cal.startOfDay(for: .now)
+        return DeviceActivityFilter(
+            segment: .daily(during: DateInterval(start: start, end: .now)),
+            users: .all,
+            devices: .all,
+            applications: tokens
+        )
+    }
+
+    var body: some View {
+        DeviceActivityReport(.totalActivity, filter: filter)
+            .id(refreshID)
+    }
 }
 
 // MARK: - Hidden report that drives the extension to compute 30 days of history
