@@ -21,9 +21,10 @@ final class AppViewModel {
     var receiptHistory: [DailyReceipt] = []
     var reportRefreshID = UUID()
 
-    // Live update timer + interval-end observer
+    // Live update timers
     private var updateTimer: Timer?
     private var intervalEndObserver: Timer?
+    private var extWatchTimer: Timer?
     private var isInitializing = false
 
     // Observable mirror of the persisted tracked-app count so SwiftUI re-renders
@@ -142,13 +143,24 @@ final class AppViewModel {
             }
         }
 
-        // Also reload immediately when SpentActivityMonitor writes a new threshold.
+        // Nudge the TodayReportView every 60s so the extension re-runs and
+        // writes fresh data to apps-simple.json.
         intervalEndObserver?.invalidate()
-        var lastKnownTs = UserDefaults(suiteName: "group.app.spent")?.double(forKey: "spent.threshold.ts") ?? 0
-        intervalEndObserver = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
-            let ts = UserDefaults(suiteName: "group.app.spent")?.double(forKey: "spent.threshold.ts") ?? 0
-            guard ts != lastKnownTs else { return }
-            lastKnownTs = ts
+        intervalEndObserver = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.reportRefreshID = UUID()
+                await self?.loadTodayReceipt()
+            }
+        }
+
+        // Watch for the extension writing apps-simple.json so the receipt
+        // updates immediately the first time the extension runs.
+        extWatchTimer?.invalidate()
+        var lastExtMod = ThresholdDataStore.extAppsModDate()
+        extWatchTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
+            let mod = ThresholdDataStore.extAppsModDate()
+            guard mod != lastExtMod else { return }
+            lastExtMod = mod
             Task { @MainActor [weak self] in
                 await self?.loadTodayReceipt()
             }
@@ -287,13 +299,65 @@ struct ThresholdDataStore {
         defaults?.set(today, forKey: "spent.threshold.resetDay")
     }
 
+    static func extAppsModDate() -> Date? {
+        guard let url = FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: groupID)?
+            .appendingPathComponent("apps-simple.json"),
+              let attrs = try? FileManager.default.attributesOfItem(atPath: url.path)
+        else { return nil }
+        return attrs[.modificationDate] as? Date
+    }
+
+    // Minimal struct matching the extension's private SimpleApp — same JSON keys.
+    private struct SimpleAppData: Codable {
+        var b: String // bundleID (real, from Screen Time)
+        var n: String // displayName
+        var m: Int    // minutes
+        var c: String // category rawValue
+    }
+
+    /// Tries to read the extension's apps-simple.json written to the App Group.
+    /// Returns nil if the file doesn't exist or was written on a previous day.
+    private static func loadExtensionApps() -> [SimpleAppData]? {
+        guard let url = FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: groupID)?
+            .appendingPathComponent("apps-simple.json"),
+              let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
+              let modified = attrs[.modificationDate] as? Date,
+              Calendar.current.isDateInToday(modified),
+              let data = try? Data(contentsOf: url),
+              let apps = try? JSONDecoder().decode([SimpleAppData].self, from: data)
+        else { return nil }
+        return apps
+    }
+
     static func loadTodayReceipt(settings: SpentSettings) -> DailyReceipt? {
         resetIfNewDay()
+        let classifier = CategoryClassifier.load()
+
+        // Prefer extension data: exact minutes, real names, all selected apps.
+        if let extApps = loadExtensionApps() {
+            let apps: [AppUsage] = extApps.compactMap { a in
+                guard a.m > 0 else { return nil }
+                return AppUsage(
+                    id: UUID(),
+                    bundleID: a.b,
+                    displayName: a.n,
+                    minutes: a.m,
+                    category: classifier.classify(bundleID: a.b, appleCategory: nil)
+                )
+            }
+            if !apps.isEmpty {
+                return DailyReceipt(id: UUID(), date: .now, apps: apps,
+                                    hourlyRate: settings.hourlyRate, mode: settings.userMode)
+            }
+        }
+
+        // Fallback: threshold counters from SpentActivityMonitor.
         let defaults = UserDefaults(suiteName: groupID)
         let count = defaults?.integer(forKey: "spent.apps.count") ?? 0
         guard count > 0 else { return nil }
 
-        // Decode stored names.
         var names: [String] = (0..<count).map { "App \($0 + 1)" }
         if let data = defaults?.data(forKey: "spent.apps.names"),
            let stored = try? JSONDecoder().decode([String].self, from: data) {
@@ -302,11 +366,6 @@ struct ThresholdDataStore {
             }
         }
 
-        // Only include apps with real usage today. Showing every tracked app
-        // surfaced clutter: apps with 0 activity, apps the user deleted, and apps
-        // that only exist on another device sharing the same iCloud account — all
-        // of which have no local usage. Filtering by minutes > 0 hides all three.
-        let classifier = CategoryClassifier.load()
         let apps: [AppUsage] = (0..<count).compactMap { i in
             let minutes = defaults?.integer(forKey: "spent.threshold.app\(i)") ?? 0
             guard minutes > 0 else { return nil }
@@ -316,8 +375,6 @@ struct ThresholdDataStore {
                 bundleID: bundleID,
                 displayName: names[i],
                 minutes: minutes,
-                // Individual authorization hides real bundle IDs/Apple categories,
-                // so default to Neutral and honor any per-app user override.
                 category: classifier.classify(bundleID: bundleID, appleCategory: nil)
             )
         }

@@ -7,6 +7,17 @@ struct ReceiptView: View {
 
     var body: some View {
         ZStack {
+            // Always-rendered today report: keeps the extension process alive so it
+            // continuously writes fresh usage data to apps-simple.json. Rendered at
+            // full size but invisible — zero opacity preserves layout so the system
+            // actually launches the extension.
+            let tokens = Set(TrackedAppTokens.all())
+            if !tokens.isEmpty {
+                TodayReportView(tokens: tokens, refreshID: appVM.reportRefreshID)
+                    .opacity(0)
+                    .allowsHitTesting(false)
+            }
+
             GeometryReader { geo in
                 if geo.size.width > 700 {
                     HStack(spacing: 0) {
