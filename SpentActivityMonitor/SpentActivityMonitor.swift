@@ -13,38 +13,30 @@ final class SpentDeviceActivityMonitor: DeviceActivityMonitor {
     private let store = ManagedSettingsStore()
     private let defaults = UserDefaults(suiteName: "group.app.spent")
 
-    // Fires at the start of each daily interval (midnight). Reset all threshold
+    // Fires at the start of each daily interval (midnight). Clears all threshold
     // counters so today's receipt starts from zero.
     //
-    // IMPORTANT: iOS also calls this immediately when startMonitoring is invoked
-    // while the schedule window is already active (e.g. the user edits their app
-    // selection mid-day). Without a per-day guard, that would wipe today's
-    // counters every time apps are re-selected, zeroing the receipt. So only
-    // reset a group's counters the first time the interval starts on a given
-    // calendar day.
+    // iOS ALSO calls this immediately when startMonitoring is invoked while the
+    // schedule window is already active (e.g. the user edits their app selection
+    // mid-day). To avoid wiping today's progress on every such restart, the reset
+    // is gated by a shared, once-per-calendar-day flag ("spent.threshold.resetDay")
+    // that the main app sets too. We only clear when that flag is not yet today.
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)
         guard activity.rawValue.hasPrefix("tracking-") else { return }
-        let groupIndex = Int(activity.rawValue.dropFirst("tracking-".count)) ?? 0
 
         let today = Self.dayStamp(.now)
-        let guardKey = "spent.threshold.resetDay.\(activity.rawValue)"
-        if defaults?.string(forKey: guardKey) == today {
-            // Already reset this group today — this is a mid-day monitoring
-            // restart (app re-selection), not a new day. Preserve existing counts.
+        guard defaults?.string(forKey: "spent.threshold.resetDay") != today else {
+            // Already reset today (by the app or an earlier callback). This is a
+            // mid-day monitoring restart, not a new day — keep existing counts.
             return
         }
 
-        let base = groupIndex * Self.appsPerGroup
         let count = defaults?.integer(forKey: "spent.apps.count") ?? 0
-        for i in base..<min(base + Self.appsPerGroup, count) {
+        for i in 0..<count {
             defaults?.removeObject(forKey: "spent.threshold.app\(i)")
         }
-        defaults?.set(today, forKey: guardKey)
-        defaults?.set(
-            ISO8601DateFormatter().string(from: .now),
-            forKey: "spent.threshold.resetDate"
-        )
+        defaults?.set(today, forKey: "spent.threshold.resetDay")
     }
 
     // Stable per-calendar-day key (yyyy-MM-dd) used to guard daily resets.

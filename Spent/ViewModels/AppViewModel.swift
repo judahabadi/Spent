@@ -256,7 +256,32 @@ struct SpentSettings: Codable {
 struct ThresholdDataStore {
     private static let groupID = "group.app.spent"
 
+    // Stable per-calendar-day key (yyyy-MM-dd) shared with the monitor extension.
+    private static func dayStamp(_ date: Date = .now) -> String {
+        let c = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        return String(format: "%04d-%02d-%02d", c.year ?? 0, c.month ?? 0, c.day ?? 0)
+    }
+
+    /// Clears all per-app threshold counters once per calendar day. The main app
+    /// owns this reset because DeviceActivity's intervalDidStart callback is
+    /// unreliable at midnight and also fires on every monitoring restart (which
+    /// must NOT wipe mid-day edits). Both this and the monitor honor the shared
+    /// "spent.threshold.resetDay" flag, so whichever runs first claims the day.
+    static func resetIfNewDay() {
+        let defaults = UserDefaults(suiteName: groupID)
+        let today = dayStamp()
+        guard defaults?.string(forKey: "spent.threshold.resetDay") != today else { return }
+        let count = defaults?.integer(forKey: "spent.apps.count") ?? 0
+        // Clear a generous range so stale indices from a larger previous selection
+        // are also cleared, not just the current count.
+        for i in 0..<max(count, 64) {
+            defaults?.removeObject(forKey: "spent.threshold.app\(i)")
+        }
+        defaults?.set(today, forKey: "spent.threshold.resetDay")
+    }
+
     static func loadTodayReceipt(settings: SpentSettings) -> DailyReceipt? {
+        resetIfNewDay()
         let defaults = UserDefaults(suiteName: groupID)
         let count = defaults?.integer(forKey: "spent.apps.count") ?? 0
         guard count > 0 else { return nil }

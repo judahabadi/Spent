@@ -42,6 +42,12 @@ final class ScreenTimeService {
         guard !newTokenSet.isEmpty else { return }
         let defaults = UserDefaults(suiteName: "group.app.spent")
 
+        // Perform any pending new-day reset FIRST, so (a) we don't carry yesterday's
+        // minutes forward and (b) the shared resetDay flag is marked "today" before
+        // startMonitoring fires intervalDidStart — which would otherwise wipe the
+        // minutes we're about to preserve for apps the user is keeping.
+        ThresholdDataStore.resetIfNewDay()
+
         // Load the previously tracked tokens and the minutes already recorded for
         // each, so re-selecting apps doesn't wipe today's progress for apps the
         // user keeps. (Array(Set) has no stable order, which previously reshuffled
