@@ -3,6 +3,7 @@ import SwiftUI
 struct ReceiptView: View {
     @Environment(AppViewModel.self) private var appVM
     @State private var showCalendar = false
+    @State private var categoryEditApp: AppUsage?
 
     var body: some View {
         ZStack {
@@ -26,6 +27,21 @@ struct ReceiptView: View {
         }
         .sheet(isPresented: Bindable(appVM).isShowingPaywall) {
             PaywallView()
+        }
+        .confirmationDialog(
+            categoryEditApp?.displayName ?? "Category",
+            isPresented: Binding(get: { categoryEditApp != nil }, set: { if !$0 { categoryEditApp = nil } }),
+            titleVisibility: .visible
+        ) {
+            if let app = categoryEditApp {
+                ForEach(AppCategory.allCases, id: \.self) { cat in
+                    Button(cat.rawValue) {
+                        appVM.setCategory(cat, for: app)
+                        categoryEditApp = nil
+                    }
+                }
+                Button("Cancel", role: .cancel) { categoryEditApp = nil }
+            }
         }
     }
 
@@ -98,6 +114,8 @@ struct ReceiptView: View {
                 sectionHeader("SPENT")
                 ForEach(appVM.todayReceipt.spentApps.sorted { $0.minutes > $1.minutes }) { app in
                     lineItem(app: app, isInvested: false)
+                        .contentShape(Rectangle())
+                        .onTapGesture { categoryEditApp = app }
                 }
             }
 
@@ -105,6 +123,8 @@ struct ReceiptView: View {
                 sectionHeader("INVESTED")
                 ForEach(appVM.todayReceipt.investedApps.sorted { $0.minutes > $1.minutes }) { app in
                     lineItem(app: app, isInvested: true)
+                        .contentShape(Rectangle())
+                        .onTapGesture { categoryEditApp = app }
                 }
             }
 
@@ -112,6 +132,8 @@ struct ReceiptView: View {
                 sectionHeader("NEUTRAL")
                 ForEach(appVM.todayReceipt.neutralApps.sorted { $0.minutes > $1.minutes }) { app in
                     neutralLineItem(app: app)
+                        .contentShape(Rectangle())
+                        .onTapGesture { categoryEditApp = app }
                 }
             }
 

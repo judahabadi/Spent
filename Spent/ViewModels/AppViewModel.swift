@@ -73,6 +73,13 @@ final class AppViewModel {
         Task { await loadTodayReceipt() }
     }
 
+    // Sets a per-app category override and refreshes the receipt.
+    func setCategory(_ category: AppCategory, for app: AppUsage) {
+        var classifier = CategoryClassifier.load()
+        classifier.setOverride(bundleID: app.bundleID, category: category)
+        Task { await loadTodayReceipt() }
+    }
+
     // MARK: - History (backfill)
 
     private static let historyKey = "spent.history"
