@@ -295,12 +295,13 @@ struct ThresholdDataStore {
             }
         }
 
-        // Build an AppUsage entry for EVERY tracked app, not just ones that have
-        // crossed the 1-minute threshold today. Otherwise lightly-used apps (and
-        // any not yet used today) silently disappear, leaving only heavy-usage
-        // social apps — making it look like only social apps were added.
-        let apps: [AppUsage] = (0..<count).map { i in
+        // Only include apps with real usage today. Showing every tracked app
+        // surfaced clutter: apps with 0 activity, apps the user deleted, and apps
+        // that only exist on another device sharing the same iCloud account — all
+        // of which have no local usage. Filtering by minutes > 0 hides all three.
+        let apps: [AppUsage] = (0..<count).compactMap { i in
             let minutes = defaults?.integer(forKey: "spent.threshold.app\(i)") ?? 0
+            guard minutes > 0 else { return nil }
             return AppUsage(
                 id: UUID(),
                 bundleID: "tracked.\(i)",
