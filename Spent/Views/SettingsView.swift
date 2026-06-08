@@ -265,9 +265,9 @@ struct SettingsView: View {
         let bundlePath = Bundle.main.bundlePath
         let inPlugIns = fm.fileExists(atPath: bundlePath + "/PlugIns/SpentActivityReport.appex")
         let inExtensions = fm.fileExists(atPath: bundlePath + "/Extensions/SpentActivityReport.appex")
-        // A DeviceActivityReport extension is a classic NSExtension app-extension
-        // and must live in PlugIns/ for the DeviceActivity host to launch it.
-        let extLocation = inPlugIns ? "PlugIns/ ✓" : (inExtensions ? "Extensions/ ✗" : "NOT FOUND ✗")
+        // A DeviceActivityReport extension is an ExtensionKit extension and must
+        // live in Extensions/ (required by App Store validation).
+        let extLocation = inExtensions ? "Extensions/ ✓" : (inPlugIns ? "PlugIns/ ✗" : "NOT FOUND ✗")
 
         // FamilyControls authorization status
         let authStatus: String = {
@@ -314,9 +314,7 @@ struct SettingsView: View {
 
         // Read the extension's embedded provisioning profile to check what entitlements
         // are actually granted in the signed binary (family-controls + app group required).
-        let extBundlePath = inPlugIns
-            ? bundlePath + "/PlugIns/SpentActivityReport.appex"
-            : bundlePath + "/Extensions/SpentActivityReport.appex"
+        let extBundlePath = Bundle.main.bundlePath + "/Extensions/SpentActivityReport.appex"
         let provPath = extBundlePath + "/embedded.mobileprovision"
         let provData = FileManager.default.contents(atPath: provPath)
         let provStr = provData.flatMap { String(bytes: $0, encoding: .ascii) } ?? ""
@@ -338,7 +336,7 @@ struct SettingsView: View {
         // (a) Shipped bundle structure: read the Info.plist the OS actually sees
         // (not our source plist) plus confirm the executable is present.
         let extBundle = Bundle(path: extBundlePath)
-        let shippedPointID = (extBundle?.infoDictionary?["NSExtension"] as? [String: Any])?["NSExtensionPointIdentifier"] as? String
+        let shippedPointID = (extBundle?.infoDictionary?["EXAppExtensionAttributes"] as? [String: Any])?["EXExtensionPointIdentifier"] as? String
         let pointIDStatus: String = {
             guard let id = shippedPointID else { return "MISSING ✗" }
             return id == "com.apple.deviceactivityui.report-extension" ? "report ✓" : id
@@ -387,7 +385,7 @@ struct SettingsView: View {
             HStack {
                 Text("Extension location")
                 Spacer()
-                Text(extLocation).foregroundStyle(inPlugIns ? .green : .red)
+                Text(extLocation).foregroundStyle(inExtensions ? .green : .red)
             }
             HStack {
                 Text("Ext provisioning")
