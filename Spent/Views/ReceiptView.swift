@@ -46,6 +46,15 @@ struct ReceiptView: View {
     private var receiptPane: some View {
         VStack(spacing: 0) {
             headerBar
+            // DIAGNOSTIC: visible report mount. If the green "EXT OK" bar shows,
+            // the extension launched; if it stays grey/blank, iOS refused to launch
+            // it and Console.app will log the reason.
+            let tokens = Set(TrackedAppTokens.all())
+            if !tokens.isEmpty {
+                TodayReportView(tokens: tokens, refreshID: appVM.reportRefreshID)
+                    .frame(height: 44)
+                    .background(Color(.systemGray4))
+            }
             ScrollView {
                 VStack(spacing: 0) {
                     periodToggle

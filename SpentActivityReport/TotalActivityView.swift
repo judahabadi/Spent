@@ -123,12 +123,14 @@ private struct SimpleApp: Codable {
 struct TotalActivityView: View {
     let configuration: TotalActivityReport.ReceiptConfiguration
 
-    // Renders transparent: this report is mounted purely to keep the extension
-    // process alive (it writes usage to the App Group). It must stay visible to
-    // the system so iOS launches the extension, but invisible to the user — so it
-    // draws nothing. Proof-of-life lives in the file/UserDefaults diagnostics.
+    // DIAGNOSTIC: render a visible bar so we can confirm whether the extension
+    // launches at all. If this green bar appears, the report extension ran.
     var body: some View {
-        Color.clear
+        Text("EXT OK · \(configuration.appUsages.count) apps")
+            .font(.system(size: 13, weight: .heavy, design: .monospaced))
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.green)
     }
 }
 
