@@ -65,7 +65,22 @@ final class AppViewModel {
         let receipt = ThresholdDataStore.loadTodayReceipt(settings: settings)
         await MainActor.run {
             self.todayReceipt = receipt ?? .empty(date: .now, hourlyRate: settings.hourlyRate, mode: settings.userMode)
+            self.persistTodayIntoHistory()
         }
+    }
+
+    // Upserts today's receipt into history keyed by calendar day. This is how
+    // weekly/monthly totals accumulate: every time today's receipt refreshes we
+    // overwrite today's history entry, so each past day retains the last snapshot
+    // taken while the app was open that day.
+    private func persistTodayIntoHistory() {
+        guard !todayReceipt.apps.isEmpty else { return }
+        let cal = Calendar.current
+        let todayKey = cal.startOfDay(for: todayReceipt.date)
+        var list = receiptHistory.filter { cal.startOfDay(for: $0.date) != todayKey }
+        list.append(todayReceipt)
+        receiptHistory = list.sorted { $0.date > $1.date }
+        saveHistory()
     }
 
     // Receipt shown for the currently selected period. Daily = today's live

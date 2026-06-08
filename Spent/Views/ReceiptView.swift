@@ -6,36 +6,20 @@ struct ReceiptView: View {
     @State private var categoryEditApp: AppUsage?
 
     var body: some View {
-        ZStack {
-            GeometryReader { geo in
-                if geo.size.width > 700 {
-                    HStack(spacing: 0) {
-                        receiptPane
-                            .frame(maxWidth: .infinity)
-                        Divider()
-                        statsPanel
-                            .frame(width: 300)
-                    }
-                } else {
+        GeometryReader { geo in
+            if geo.size.width > 700 {
+                HStack(spacing: 0) {
                     receiptPane
+                        .frame(maxWidth: .infinity)
+                    Divider()
+                    statsPanel
+                        .frame(width: 300)
                 }
-            }
-            .background(Color(.systemBackground))
-
-            // Today report, mounted as a TRANSPARENT, full-size overlay on TOP of the
-            // receipt. iOS only launches a DeviceActivityReport extension while its
-            // view is genuinely visible — opacity(0) OR being fully occluded by an
-            // opaque sibling both count as "not visible" and silently prevent launch.
-            // The extension renders Color.clear (see TotalActivityView), so this stays
-            // invisible to the user while remaining visible to the system; hit testing
-            // is off so taps fall through to the receipt below.
-            let tokens = Set(TrackedAppTokens.all())
-            if !tokens.isEmpty {
-                TodayReportView(tokens: tokens, refreshID: appVM.reportRefreshID)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .allowsHitTesting(false)
+            } else {
+                receiptPane
             }
         }
+        .background(Color(.systemBackground))
         .fullScreenCover(isPresented: Bindable(appVM).isShowingSettings) {
             SettingsView()
         }

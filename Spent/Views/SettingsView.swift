@@ -7,7 +7,6 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showDeleteConfirm = false
     @State private var showAppSelection = false
-    @State private var showBackfill = false
 
     var body: some View {
         NavigationStack {
@@ -221,16 +220,6 @@ struct SettingsView: View {
                     Text(appVM.receiptHistory.isEmpty ? "—" : "\(appVM.receiptHistory.count) days")
                         .foregroundStyle(.secondary)
                 }
-            }
-            Button {
-                showBackfill = true
-            } label: {
-                Text("Import last 30 days")
-                    .foregroundStyle(.primary)
-            }
-            .disabled(appVM.trackedAppCount == 0)
-            .sheet(isPresented: $showBackfill) {
-                BackfillView()
             }
         }
     }
