@@ -68,6 +68,57 @@ final class AppViewModel {
         }
     }
 
+    // Receipt shown for the currently selected period. Daily = today's live
+    // receipt; weekly/monthly/yearly aggregate per-app minutes across the
+    // historical receipts (+ today) that fall inside the period window.
+    var displayedReceipt: DailyReceipt {
+        switch selectedPeriod {
+        case .daily:   return todayReceipt
+        case .weekly:  return aggregatedReceipt(days: 7)
+        case .monthly: return aggregatedReceipt(days: 30)
+        case .yearly:  return aggregatedReceipt(days: 365)
+        }
+    }
+
+    private func aggregatedReceipt(days: Int) -> DailyReceipt {
+        let cal = Calendar.current
+        let todayKey = cal.startOfDay(for: .now)
+        let cutoff = cal.date(byAdding: .day, value: -(days - 1), to: todayKey) ?? todayKey
+
+        // Prior days from history within the window, plus the live today receipt
+        // (so today reflects the latest data, not a possibly-stale history copy).
+        let prior = receiptHistory.filter {
+            $0.date >= cutoff && cal.startOfDay(for: $0.date) != todayKey
+        }
+        let receipts = prior + [todayReceipt]
+
+        var minutes: [String: Int] = [:]
+        var names: [String: String] = [:]
+        for receipt in receipts {
+            for app in receipt.apps {
+                minutes[app.bundleID, default: 0] += app.minutes
+                names[app.bundleID] = app.displayName
+            }
+        }
+
+        let classifier = CategoryClassifier.load()
+        let apps = minutes.compactMap { bundleID, mins -> AppUsage? in
+            guard mins > 0 else { return nil }
+            return AppUsage(
+                id: UUID(),
+                bundleID: bundleID,
+                displayName: names[bundleID] ?? bundleID,
+                minutes: mins,
+                category: classifier.classify(bundleID: bundleID, appleCategory: nil)
+            )
+        }
+
+        return DailyReceipt(
+            id: UUID(), date: .now, apps: apps,
+            hourlyRate: settings.hourlyRate, mode: settings.userMode
+        )
+    }
+
     // Called after the user saves a new app selection so the receipt updates.
     func reloadTrackedApps() {
         refreshTrackedAppCount()

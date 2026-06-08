@@ -8,13 +8,14 @@ struct ReceiptView: View {
     var body: some View {
         ZStack {
             // Always-rendered today report: keeps the extension process alive so it
-            // continuously writes fresh usage data to apps-simple.json. Rendered at
-            // full size but invisible — zero opacity preserves layout so the system
-            // actually launches the extension.
+            // continuously writes fresh usage data to apps-simple.json. iOS will NOT
+            // launch a DeviceActivityReport extension whose view is opacity(0) — it
+            // treats it as not visible and never calls makeConfiguration. So the
+            // report is rendered at full size as the ZStack's bottom layer and left
+            // genuinely visible; the opaque receipt UI on top occludes it.
             let tokens = Set(TrackedAppTokens.all())
             if !tokens.isEmpty {
                 TodayReportView(tokens: tokens, refreshID: appVM.reportRefreshID)
-                    .opacity(0)
                     .allowsHitTesting(false)
             }
 
@@ -121,27 +122,27 @@ struct ReceiptView: View {
             receiptHeader
             Divider()
 
-            if !appVM.todayReceipt.spentApps.isEmpty {
+            if !appVM.displayedReceipt.spentApps.isEmpty {
                 sectionHeader("SPENT")
-                ForEach(appVM.todayReceipt.spentApps.sorted { $0.minutes > $1.minutes }) { app in
+                ForEach(appVM.displayedReceipt.spentApps.sorted { $0.minutes > $1.minutes }) { app in
                     lineItem(app: app, isInvested: false)
                         .contentShape(Rectangle())
                         .onTapGesture { categoryEditApp = app }
                 }
             }
 
-            if !appVM.todayReceipt.investedApps.isEmpty {
+            if !appVM.displayedReceipt.investedApps.isEmpty {
                 sectionHeader("INVESTED")
-                ForEach(appVM.todayReceipt.investedApps.sorted { $0.minutes > $1.minutes }) { app in
+                ForEach(appVM.displayedReceipt.investedApps.sorted { $0.minutes > $1.minutes }) { app in
                     lineItem(app: app, isInvested: true)
                         .contentShape(Rectangle())
                         .onTapGesture { categoryEditApp = app }
                 }
             }
 
-            if !appVM.todayReceipt.neutralApps.isEmpty {
+            if !appVM.displayedReceipt.neutralApps.isEmpty {
                 sectionHeader("NEUTRAL")
-                ForEach(appVM.todayReceipt.neutralApps.sorted { $0.minutes > $1.minutes }) { app in
+                ForEach(appVM.displayedReceipt.neutralApps.sorted { $0.minutes > $1.minutes }) { app in
                     neutralLineItem(app: app)
                         .contentShape(Rectangle())
                         .onTapGesture { categoryEditApp = app }
@@ -163,12 +164,21 @@ struct ReceiptView: View {
         VStack(spacing: 4) {
             Text("SPENT")
                 .font(.system(size: 22, weight: .bold, design: .monospaced))
-            Text(appVM.selectedDate.formatted(date: .complete, time: .omitted).uppercased())
+            Text(periodSubtitle)
                 .font(.system(size: 10, design: .monospaced))
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
+    }
+
+    private var periodSubtitle: String {
+        switch appVM.selectedPeriod {
+        case .daily:   return appVM.selectedDate.formatted(date: .complete, time: .omitted).uppercased()
+        case .weekly:  return "LAST 7 DAYS"
+        case .monthly: return "LAST 30 DAYS"
+        case .yearly:  return "LAST 365 DAYS"
+        }
     }
 
     private func sectionHeader(_ title: String) -> some View {
@@ -199,7 +209,7 @@ struct ReceiptView: View {
                     .overlay(Image(systemName: "lock.fill").font(.system(size: 8)))
                     .frame(width: 70, alignment: .trailing)
             } else {
-                let cost = app.cost(hourlyRate: appVM.todayReceipt.hourlyRate)
+                let cost = app.cost(hourlyRate: appVM.displayedReceipt.hourlyRate)
                 Text(isInvested ? "-\(CalculationEngine.formatCurrency(cost))" : CalculationEngine.formatCurrency(cost))
                     .font(.system(size: 11, design: .monospaced))
                     .foregroundStyle(isInvested ? .green : .primary)
@@ -226,8 +236,8 @@ struct ReceiptView: View {
 
     private var totalsSection: some View {
         VStack(spacing: 0) {
-            totalRow(label: "SUBTOTAL SPENT", value: appVM.todayReceipt.spentCost, negative: false)
-            totalRow(label: "INVESTED CREDIT", value: appVM.todayReceipt.investedCredit, negative: true)
+            totalRow(label: "SUBTOTAL SPENT", value: appVM.displayedReceipt.spentCost, negative: false)
+            totalRow(label: "INVESTED CREDIT", value: appVM.displayedReceipt.investedCredit, negative: true)
             Divider().padding(.vertical, 6)
             netTotalRow
             streakRow
@@ -272,8 +282,8 @@ struct ReceiptView: View {
     }
 
     private var netTotalRow: some View {
-        let net = appVM.todayReceipt.netTotal
-        let isProfitDay = appVM.todayReceipt.isProfitDay
+        let net = appVM.displayedReceipt.netTotal
+        let isProfitDay = appVM.displayedReceipt.isProfitDay
 
         return HStack {
             Text(isProfitDay ? "YOU EARNED" : "TOTAL DUE")
