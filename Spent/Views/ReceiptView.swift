@@ -46,14 +46,14 @@ struct ReceiptView: View {
     private var receiptPane: some View {
         VStack(spacing: 0) {
             headerBar
-            // DIAGNOSTIC: visible report mount. If the green "EXT OK" bar shows,
-            // the extension launched; if it stays grey/blank, iOS refused to launch
-            // it and Console.app will log the reason.
+            // Live report summary. This MUST stay visible: iOS only launches the
+            // DeviceActivityReport extension while its view is on-screen and
+            // rendering real content. Keeping it here keeps the extension running,
+            // which writes exact per-app minutes to the App Group for the receipt.
             let tokens = Set(TrackedAppTokens.all())
             if !tokens.isEmpty {
                 TodayReportView(tokens: tokens, refreshID: appVM.reportRefreshID)
-                    .frame(height: 44)
-                    .background(Color(.systemGray4))
+                    .frame(height: 28)
             }
             ScrollView {
                 VStack(spacing: 0) {
