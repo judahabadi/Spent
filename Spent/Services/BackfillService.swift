@@ -33,11 +33,12 @@ struct TodayReportView: View {
     private var filter: DeviceActivityFilter {
         let cal = Calendar.current
         let start = cal.startOfDay(for: .now)
+        // No `applications:` filter — report EVERY app used today, not just the
+        // user's tracked selection. The receipt shows everything they actually used.
         return DeviceActivityFilter(
             segment: .daily(during: DateInterval(start: start, end: .now)),
             users: .all,
-            devices: .all,
-            applications: tokens
+            devices: .all
         )
     }
 
