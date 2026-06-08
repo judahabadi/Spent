@@ -7,18 +7,6 @@ struct ReceiptView: View {
 
     var body: some View {
         ZStack {
-            // Always-rendered today report: keeps the extension process alive so it
-            // continuously writes fresh usage data to apps-simple.json. iOS will NOT
-            // launch a DeviceActivityReport extension whose view is opacity(0) — it
-            // treats it as not visible and never calls makeConfiguration. So the
-            // report is rendered at full size as the ZStack's bottom layer and left
-            // genuinely visible; the opaque receipt UI on top occludes it.
-            let tokens = Set(TrackedAppTokens.all())
-            if !tokens.isEmpty {
-                TodayReportView(tokens: tokens, refreshID: appVM.reportRefreshID)
-                    .allowsHitTesting(false)
-            }
-
             GeometryReader { geo in
                 if geo.size.width > 700 {
                     HStack(spacing: 0) {
@@ -33,6 +21,20 @@ struct ReceiptView: View {
                 }
             }
             .background(Color(.systemBackground))
+
+            // Today report, mounted as a TRANSPARENT, full-size overlay on TOP of the
+            // receipt. iOS only launches a DeviceActivityReport extension while its
+            // view is genuinely visible — opacity(0) OR being fully occluded by an
+            // opaque sibling both count as "not visible" and silently prevent launch.
+            // The extension renders Color.clear (see TotalActivityView), so this stays
+            // invisible to the user while remaining visible to the system; hit testing
+            // is off so taps fall through to the receipt below.
+            let tokens = Set(TrackedAppTokens.all())
+            if !tokens.isEmpty {
+                TodayReportView(tokens: tokens, refreshID: appVM.reportRefreshID)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .allowsHitTesting(false)
+            }
         }
         .fullScreenCover(isPresented: Bindable(appVM).isShowingSettings) {
             SettingsView()
